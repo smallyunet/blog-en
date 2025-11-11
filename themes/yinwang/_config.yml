@@ -30,19 +30,31 @@ post:
   backHome_prefix: "↶ "        # Prefix content for back to home
   backHome_content: "Back to Home"  # Main content for back to home
   backHome_suffix: ""          # Suffix content for back to home
-  show_tags: false             # Display tags at the end of the article
-  enable_hidden: true
+  show_tags: false              # Display tags at the end of the article
 
 # Tag cloud
 tags:
   all: false       # Display all tags on the tag cloud page
 
-# Micro-blog (removed)
+# Micro-blog
+github:
+  owner: smallyunet
+  repo: hexo-blog
+micro_blogs:
+  - year: 2020
+    issue: 7
+  - year: 2021
+    issue: 10
+  - year: 2022
+    issue: 19
+  - year: 2023
+    issue: 29
+  - year: 2024
+    issue: 32
+  - year: 2025
+    issue: 35
+issue_years: []
 
 google_analysis:
   enable: true
-  id: G-5JRBZ6P1W3
-
-# Static assets version (for cache busting). Bump this when CSS/JS changes.
-# Leaving it empty avoids touching all generated HTML on each build.
-asset_version: "2025-09-28.27"
+  id: G-Y7C0CVX9PK

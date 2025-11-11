@@ -1,11 +1,11 @@
 
-.outer
+.inner
   h3= page.title
 
   != page.content
 
   if site.tags && site.tags.length
-    != tagcloud({amount:0, min_font:12})
+    != tagcloud({amount:0, min_font:14})
     h3= __('tag_list')
     != list_tags({orderby: 'length', order: -1})
 
