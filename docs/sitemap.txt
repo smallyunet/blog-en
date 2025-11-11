@@ -1,8 +1,6 @@
 https://en.smallyu.net/about/index.html
-https://en.smallyu.net/2025/09/20/Can%20Wang%20Yin's%20Courses%20Help%20Programmers%20Resist%20the%20Impact%20of%20AI/
 https://en.smallyu.net/2025/08/05/Analysis%20of%20the%20Arcium%20Network%20Project/
 https://en.smallyu.net/2025/09/06/A%20Compatibility%20Layer%20Integrating%20Geth%20and%20CometBFT/
-https://en.smallyu.net/2025/08/25/Is%20Wang%20Yin's%20Computer%20Course%20Expensive?/
 https://en.smallyu.net/2025/08/20/DeFi%20Basics1/
 https://en.smallyu.net/2025/08/06/Analysis%20of%20the%200G%20Project/
 https://en.smallyu.net/2025/08/01/Analysis%20of%20the%20Psyche%20Network%20Project/
@@ -118,7 +116,6 @@ https://en.smallyu.net/tags/Programming-Language/
 https://en.smallyu.net/tags/Tutorial/
 https://en.smallyu.net/tags/BTC/
 https://en.smallyu.net/tags/Interview-Questions/
-https://en.smallyu.net/tags/Wang-Yin/
 https://en.smallyu.net/tags/DeFi/
 https://en.smallyu.net/tags/zk/
 https://en.smallyu.net/tags/planning/
