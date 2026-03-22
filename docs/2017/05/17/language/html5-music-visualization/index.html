@@ -1,0 +1,107 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>HTML5 Music Visualization</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2017/05/17/language/html5-music-visualization/"><meta property="og:title" content="HTML5 Music Visualization"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2017/05/17/language/html5-music-visualization/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.1"><link rel="stylesheet" href="/css/post.css?v=v1.1"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.1"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>HTML5 Music Visualization</h1><div class="time">2017-05-17</div><div class="title-margin"></div><img src="201705141494765899218386.png" />
+
+<p>Let me walk through the process of implementing music visualization with HTML5.</p>
+<p><strong>Build the static page</strong></p>
+<p>The static page structure has three parts: <code>header</code>, <code>left</code>, and <code>right</code>. <code>header</code> uses a semantic tag, while both <code>left</code> and <code>right</code> are implemented with <code>div</code>s.</p>
+<img src="201705141494770946657494.png" />
+
+<p>Something like this is enough. Then change the background color to black, the text to white, optionally add border lines, and give it some padding or margin, and the static page is done.</p>
+<p>But the layout is not the main point here. You could put a track list in the left sidebar and switch songs by clicking. To keep things simple, though, I just load a specified song directly in the background. The song is Xu Song’s “Yan Hua Xiao”, and part of the lyrics is shown in the left sidebar.</p>
+<p><strong>Create the audio file object</strong></p>
+<p>The <code>AudioContext</code> object is used to obtain the audio source.</p>
+<blockquote>
+<p>(Node) <code>AudioContext</code>: an object that contains various <code>AudioNode</code> objects and their connections. You can think of it as a context object. In most cases, a document only has one <code>AudioContext</code>.</p>
+<p>(Method) <code>createBufferSource()</code>: creates an <code>AudioBufferSourceNode</code> object.</p>
+</blockquote>
+<p>It can be written like this:</p>
+<pre><code>var ac = new window.AudioContext();    // Instantiate ac as an audio object
+var bs = ac.createBufferSource();      // Use bs to hold the audio file resource
+</code></pre>
+<p>Once you have the audio resource, can you play it immediately? Of course not, because the file has not been specified yet. You still need to tell the object which audio file to play.</p>
+<p><strong>Get the audio data</strong></p>
+<p>After creating the buffer source, you reach the <code>AudioBufferSourceNode</code> node. This node has a property called <code>buffer</code>, which is used to specify the file resource. That property needs data of type <code>buffer</code>.</p>
+<blockquote>
+<p>(Node) <code>AudioBufferSourceNode</code>: represents a chunk of audio resource in memory. Its audio data is stored in <code>AudioBuffer</code> (its <code>buffer</code> property).</p>
+<p>(Property) <code>buffer</code>: an <code>AudioBuffer</code> object that represents the audio resource data to be played.</p>
+</blockquote>
+<p>There are two ways to get a <code>buffer</code>. One is to use AJAX with the response type set to <code>arraybuffer</code>, then decode it. The other is to use <code>FileReader</code> to read the file and get a blob value. The second method is often used after uploading a file through an <code>input</code>, then parsing it. The first method is more convenient.</p>
+<p>Native AJAX looks like this:</p>
+<pre><code>var url = &quot;...&quot;;
+var xhr = new XMLHttpRequest();
+xhr.abort();
+xhr.open(&quot;GET&quot;, url);
+xhr.responseType = &quot;arraybuffer&quot;;
+xhr.onload = function() &#123;
+    return xhr.response;
+&#125;
+xhr.send();
+</code></pre>
+<p>Inside the function triggered by <code>onload</code>, <code>xhr.response</code> is exactly the value we want.</p>
+<blockquote>
+<p>(Method) <code>decodeAudioData(arrayBuffer, succ(buffer), err)</code>: asynchronously decodes the audio data contained in <code>arrayBuffer</code>.</p>
+</blockquote>
+<p>Decode the <code>arraybuffer</code> like this:</p>
+<pre><code>ac.decodeAudioData(arraybuffer, function(buffer) &#123; ... &#125;, function(err) &#123; ... &#125;);
+bs.buffer = buffer;    // The buffer in the callback is the one we want
+</code></pre>
+<p><strong>Play the music</strong></p>
+<blockquote>
+<p>(Method) <code>start</code>: starts playing audio</p>
+</blockquote>
+<p>At this point, call the <code>start</code> method:</p>
+<pre><code>bs.start(0);
+</code></pre>
+<p>Open the page, and the music starts playing.</p>
+<p><strong>Volume control</strong></p>
+<blockquote>
+<p>(Node) <code>GainNode</code>: an object that changes audio volume by modifying the signal strength of every sample frame passing through it.</p>
+<p>(Method) <code>createGain()</code>: creates a <code>GainNode</code> object.</p>
+<p>(Property) <code>value</code>: changes the strength of the audio signal. The default is <code>1</code>, and the minimum is <code>0</code>.</p>
+</blockquote>
+<p>Playing music is not enough; you also need a volume control widget. Volume control uses the <code>GainNode</code> node:</p>
+<pre><code>var gainNode = accreateGain();    // Create the GainNode object
+gainNode.connect(ac.destination); // Connect gainNode to AudioDestinationNode
+</code></pre>
+<p>Now you have an object for volume control.</p>
+<pre><code>gainNode.gain.value = ...;
+</code></pre>
+<p><code>gain.value</code> controls the strength of the input signal, which means the volume. In HTML, use an <code>input</code> with <code>type=&quot;range&quot;</code> and pass its value to the object, and you can control the volume in real time.</p>
+<p><strong>Get parsed audio data</strong></p>
+<blockquote>
+<p>(Node) <code>AnalyserNode</code>: an audio analysis object. It can analyze the frequency-domain and time-domain information of audio resources in real time, but it does not process the audio stream itself.</p>
+<p>(Method) <code>createAnalyser()</code>: creates an <code>AnalyserNode</code> object.</p>
+</blockquote>
+<blockquote>
+<p>(Property) <code>fftsize</code>: sets the FFT size (FFT is the fast algorithm for the discrete Fourier transform, used to transform a signal into the frequency domain). It must be a power of 2 between 32 and 2048, with a default of 2048. The number of real-time frequency-domain data points obtained is half of <code>fftSize</code>.</p>
+<p>(Property) <code>frequencyBinCount</code>: half of the FFT size, which is the number of real-time frequency-domain data points obtained.</p>
+</blockquote>
+<blockquote>
+<p>(Method) <code>getByteFrequencyData(Uint8Array)</code>: copies the current audio frequency-domain data (of size <code>frequencyBinCount</code>) into a <code>Uint8Array</code> (an 8-bit unsigned integer typed array).</p>
+</blockquote>
+<p>First create the <code>AnalyserNode</code> object, then set the value of <code>fftsize</code>. FFT is used in digital signal processing. It transforms the input signal of the audio stream into the frequency domain, and <code>getByteFrequencyData()</code> retrieves the processed frequency-domain data.</p>
+<pre><code>var analyser = ac.createAnalyser();                       // Instantiate the object
+analyser.fftSize = 32;                                   // Set fftsize
+var arr = new Uint8Array(analyser.frequencyBinCount);    // getByteFrequencyData() requires an 8-bit unsigned integer typed array
+analyser.getByteFrequencyData(arr);                      // arr is the desired frequency-domain data
+</code></pre>
+<p>The resulting array <code>arr</code> is the data used to draw the visualization effect.</p>
+<blockquote>
+<p>(Method) <code>window.requestAnimationFrame()</code>: tells the browser that you want to perform an animation and asks it to call the specified function before the next repaint to update the animation. The callback is executed before the repaint.</p>
+</blockquote>
+<p>A single analysis only yields one set of data, so you need <code>requestAnimationFrame</code> to keep analyzing continuously and keep producing <code>arr</code>.</p>
+<p><strong>Draw the front-end interface</strong></p>
+<p>The front-end interface is drawn with <code>canvas</code> to achieve the music visualization effect.</p>
+<pre><code>var box = document.getElementById(&quot;right&quot;); // Get the DOM for the right area
+box.appendChild(canvas);                     // Create the canvas node
+var ctx = canvas.getContext(&quot;2d&quot;);          // Instantiate the canvas context
+</code></pre>
+<p>Next comes using a <code>for</code> loop and <code>ctx</code> to draw rectangles and circles, then fill them with gradients.</p>
+<p>Here is the relationship between the Web Audio API pieces used in this example:</p>
+<img src="201705141494773947635812.png" />
+
+<p>The dotted line marks nodes that can be skipped so the audio file can be played directly. Well, that diagram has an error.</p>
+</div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.1"></script><script defer src="/js/highlight.min.js?v=v1.1"></script><script defer src="/js/main.js?v=v1.1"></script><script defer src="/js/lightbox.js?v=v1.1"></script><script defer src="/js/bootstrap.min.js?v=v1.1"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>

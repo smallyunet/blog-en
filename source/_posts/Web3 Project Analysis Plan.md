@@ -53,7 +53,7 @@ People with strong research skills can learn anything more easily. Think about i
 
 So why do I think I can write analysis reports? I haven’t written many before, but I have done some horizontal comparisons of projects based on tech. Focusing on analyzing one project’s technology shouldn’t be difficult. For projects I’ve worked on, I could definitely write about the details—though I can’t because they’re still active. Writing project analyses is also a process of learning and accumulating.
 
-In fact, I outlined my methodology for analyzing blockchain projects a while ago in this article: [Understanding the Technical Architecture of Any Blockchain Project](/2024/10/15/看懂任意区块链项目的技术架构/). I still think that article holds up—it’s all about on-chain and off-chain interactions, and different projects just plug in different business logic.
+In fact, I outlined my methodology for analyzing blockchain projects a while ago in this article: [Understanding the Technical Architecture of Any Blockchain Project](/2024/10/15/Understanding the Technical Architecture of Any Blockchain Project/). I still think that article holds up. It is all about on-chain and off-chain interactions, and different projects just plug in different business logic.
 
 ### Choosing a Writing Platform
 

@@ -9,7 +9,7 @@ draft_date: 2025-07-11 22:18:37
 
 Technically, Bitcoin Runes are simple and easy to understand. Implementing Runes only requires the use of the `OP_RETURN` opcode in Bitcoin Script. Precisely because of this simplicity, Runes are relatively clean from a technical perspective and not as complex as Inscriptions or RGB in terms of off-chain state management. The power of Runes lies in how it sparked an ecosystem around it. Though that hype has cooled down, we’re not focused on market trends here—we’ll look at Runes from a purely technical angle and develop a simplified version of the Runes protocol step-by-step. Once we fully understand Runes, we can dive into more complex projects like Alkanes, a protocol supporting WASM smart contracts on Bitcoin.
 
-This tutorial builds on concepts covered in [Bitcoin Script Development Tutorial](/2025/07/10/比特币脚本开发教程/). If you’re unfamiliar with Bitcoin Script, it’s recommended to read that first.
+This tutorial builds on concepts covered in [Bitcoin Script Development Tutorial](/2025/07/10/Bitcoin Script Development Tutorial/). If you are unfamiliar with Bitcoin Script, it is recommended to read that first.
 
 ### 1. Define the Data Structure
 

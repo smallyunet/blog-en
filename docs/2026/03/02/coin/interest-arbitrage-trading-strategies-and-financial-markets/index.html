@@ -1,0 +1,79 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>Interest, Arbitrage, Trading Strategies, and Financial Markets</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2026/03/02/coin/interest-arbitrage-trading-strategies-and-financial-markets/"><meta property="og:title" content="Interest, Arbitrage, Trading Strategies, and Financial Markets"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2026/03/02/coin/interest-arbitrage-trading-strategies-and-financial-markets/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.1"><link rel="stylesheet" href="/css/post.css?v=v1.1"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.1"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>Interest, Arbitrage, Trading Strategies, and Financial Markets</h1><div class="time">2026-03-02</div><div class="title-margin"></div><h3 id="Funding-rate-arbitrage"><a href="#Funding-rate-arbitrage" class="headerlink" title="Funding-rate arbitrage"></a>Funding-rate arbitrage</h3><p>Funding-rate arbitrage is a risk-free, principal-protected arbitrage strategy. At first I tried to write scripts to run it myself, but later I discovered that Binance directly provides a bot for this:</p>
+<div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+    <img src="1.png" style="width:35%; height:auto;">
+    <img src="2.png" style="width:35%; height:auto;">
+</div>
+
+<p>The Arbitrage Bot here is the funding-rate arbitrage bot. Once you open it, there are many tokens to choose from, including sorting by funding rate. Binance’s bot is also quite smart: if the funding rate is positive, it opens the normal arbitrage strategy using USDT; if the funding rate is negative, it opens the reverse strategy using the token.</p>
+<p>The profit margin of funding-rate arbitrage is very small, especially for major coins such as BTC, where APR is below 1%. In the current weak market environment, you would probably need to hold for more than 300 days just to overcome fee drag. In practice, it is not very cost-effective. If, however, you sort by funding rate and choose the token with the highest one, the APR can be somewhat higher, perhaps 40% or even more. Of course, high returns also mean high volatility and risk:</p>
+<div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+  <img src="3.png" style="width:35%; height:auto;">
+  <!-- <img src="4.png" style="width:35%; height:auto;"> -->
+  <img src="5.png" style="width:35%; height:auto;">
+</div>
+
+<p>Funding-rate arbitrage is delta-neutral. If a token suddenly doubles and liquidates the 2x long contract, would that cause you to lose half your principal? No. Because once the spot position doubles, selling it offsets the liquidation loss exactly. So your principal does not change. The whole process is simply earning the funding rate during that period.</p>
+<p>So sorting tokens by funding rate and then opening an arbitrage bot is the only method I have personally tried when I wanted to earn a bit of interest.</p>
+<h3 id="Principal-protected-earn"><a href="#Principal-protected-earn" class="headerlink" title="Principal-protected earn"></a>Principal-protected earn</h3><div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+  <img src="5.png" style="width:35%; height:auto;">
+  <img src="6.png" style="width:35%; height:auto;">
+</div>
+
+<p>Simple Earn is simple: deposit funds into Binance and earn interest. The problem is that the APR is not high. USDC only yields about 6%, and there is a very strict cap, supporting only 200 USDC. It is almost useless.</p>
+<h3 id="Dual-investment"><a href="#Dual-investment" class="headerlink" title="Dual investment"></a>Dual investment</h3><p>The key to the Dual Investment strategy is that you need to have a target price in mind. For example, if you are willing to buy BTC at 60000, then you buy at 60000 regardless of whether it keeps falling afterward. The same applies on the sell side.</p>
+<p>Dual Investment is more like futures settlement logic. For ordinary retail traders, it is likewise not very useful. Why is the interest high? Because the risk is high too: you can sell too early and miss the upside, or catch a falling knife. Higher risk leads to higher interest.</p>
+<p>What if you set a completely absurd price in Dual Investment? For example, if you set it to buy BTC at 100000, could you not just keep earning interest forever because the condition would never be triggered? In reality, interest is determined by risk. When the market sees little risk, nobody is willing to pay a high rate, so a market with a ridiculous strike like that simply does not exist.</p>
+<h3 id="Opening-futures-adding-leverage"><a href="#Opening-futures-adding-leverage" class="headerlink" title="Opening futures, adding leverage"></a>Opening futures, adding leverage</h3><p>Do not do dumb things.</p>
+<h3 id="Lido"><a href="#Lido" class="headerlink" title="Lido"></a>Lido</h3><img src="8.png" width="80%">
+
+<p>An APR of 2.3% is simply too low. As someone once put it, for ordinary people anything below 5% APR is not even worth considering. It takes at least 20 years to make meaningful money.</p>
+<h3 id="Aave"><a href="#Aave" class="headerlink" title="Aave"></a>Aave</h3><img src="9.png" width="80%">
+
+<p>Aave’s APR is also very low. Even the highest rate is below 2%, which is almost the same as nothing.</p>
+<h3 id="Uniswap"><a href="#Uniswap" class="headerlink" title="Uniswap"></a>Uniswap</h3><img src="10.png" width="80%">
+
+<p>At first glance it looks pretty shocking: USDC&#x2F;ETH shows a 76% APR. The problem is that providing liquidity comes with impermanent loss. You put in 1000 ETH and 1000 USDC, and as the pool keeps being traded against, when you finally withdraw you might be left with only 300 ETH and 1700 USDC. The total token count gets rebalanced, but if ETH moves violently, the economics of your deposit can become completely unattractive. As for stablecoin pools on Uniswap such as USDT&#x2F;USDC, their yields are naturally very low, around 1%.</p>
+<h3 id="BTC-5-minute-up-or-down"><a href="#BTC-5-minute-up-or-down" class="headerlink" title="BTC 5-minute up or down"></a>BTC 5-minute up or down</h3><img src="11.png" width="80%">
+
+<p>Polymarket has launched a BTC 5-minute up-or-down game. So is there any profit opportunity in that market? The conclusion is no. It is a negative-expected-value game. For retail traders and low-frequency participants, it is pure gambling. You could even say that all event prediction markets are gambling. Forget about any stable arbitrage opportunity.</p>
+<h3 id="Free-money-on-Polymarket"><a href="#Free-money-on-Polymarket" class="headerlink" title="Free money on Polymarket"></a>Free money on Polymarket</h3><p>On one hand, Polymarket has some novelty markets, such as <a href="https://polymarket.com/event/will-jesus-christ-return-before-2027">Will Jesus Christ Return Before 2027?</a>. In that kind of market, the price of <code>No</code> is around 96.2c, which means that if you hold the position for a year until the event settles, the annualized return is about 4%. If you insist on comparing it with traditional bank deposits or cash APR, that yield is actually not bad.</p>
+<p>On the other hand, Polymarket has a mechanism where, for certain <a href="https://help.polymarket.com/en/articles/13364459-holding-rewards">eligible</a> markets, you continue to receive shares at an annualized rate of 4% simply by holding. Some markets have outcomes that are obviously knowable, so you can buy with confidence. For example, if the <code>No</code> price in a certain market is 91.1c, then once the event settles you earn close to 9% annualized, and after adding the 4% holding reward, it is actually a fairly decent cash-management option.</p>
+<h3 id="MEV-attacks-on-chain-scientists-the-dark-forest"><a href="#MEV-attacks-on-chain-scientists-the-dark-forest" class="headerlink" title="MEV attacks, on-chain scientists, the dark forest"></a>MEV attacks, on-chain scientists, the dark forest</h3><p>Give it a rest.</p>
+<h3 id="Financial-markets"><a href="#Financial-markets" class="headerlink" title="Financial markets"></a>Financial markets</h3><p>After so many years of development, plus DeFi Summer a few years ago, whether in CEX yield products or DeFi, the moment the market offers a low-risk arbitrage opportunity, hundreds of millions of dollars and high-frequency, low-latency bots from Wall Street giants will rush in. There are very few opportunities left for ordinary players.</p>
+<p>How do you make money in financial markets?</p>
+<ol>
+<li>Trade time for space (farm airdrops)</li>
+<li>Trade principal for interest (deploy large capital)</li>
+<li>Trade knowledge and effort for excess return (spot DCA, searching for alpha)</li>
+</ol>
+<p>Beyond that, there is no other way.</p>
+<p>Retail gets harvested because:</p>
+<ol>
+<li>It does not have unlimited principal.</li>
+<li>It lacks top-tier understanding.</li>
+<li>It lacks extreme patience.</li>
+</ol>
+<p>In short, it has none of those things. What it does have is ignorance and the desire to make money.</p>
+<h3 id="DCA-strategy"><a href="#DCA-strategy" class="headerlink" title="DCA strategy"></a>DCA strategy</h3><p>After going through so many projects, Li Xiaolai ultimately concluded that the ultimate trading strategy is DCA. The book <a href="https://ri.firesbox.com/#/cn/">Dollar-Cost Averaging Changes Your Fate</a> is actually very good and very dense with information. When we feel tempted by certain high-frequency trading strategies, it is worth revisiting the key points mentioned in that book. DCA is exactly the sort of strategy that requires extreme patience.</p>
+<p>Of course, both DCA as a strategy and Li Xiaolai’s theory also have parts that can feel a bit hand-wavy. For example, by the end of the book his advice is to improve your ability to earn outside the market. That is basically very correct nonsense. Everyone knows that outside income matters.</p>
+<p>DCA is a strategy that fights against human nature, and it is indeed hard to execute strictly, especially for people who work in the industry. You see market prices and sentiment every day. It is impossible to keep DCAing when sentiment is euphoric, and it is also hard to restrain yourself when sentiment is depressed.</p>
+<p>If you want to make money, you still have to do something that other people cannot do.</p>
+<h3 id="Restaking"><a href="#Restaking" class="headerlink" title="Restaking"></a>Restaking</h3><p>I just mentioned DCA. So if you stick to DCAing BTC, can BTC restaking let you earn a bit of interest on top of holding BTC?</p>
+<img src="12.png" width="80%">
+
+<p>Babylon, the only project in the restaking space that truly does BTC restaking, offers up to 0.87% APR. That is basically negligible. After all, with $2B locked in the protocol, APR cannot come out of thin air. No matter how much revenue the project generates, once it is spread across $2B of staked assets, the APR cannot be high. So BTC restaking is hardly worth doing.</p>
+<h3 id="Earning-outside-the-market"><a href="#Earning-outside-the-market" class="headerlink" title="Earning outside the market"></a>Earning outside the market</h3><p>I have been thinking about this question of earning outside the market. I realized that the process of DCA plus hold is mind-numbingly boring.</p>
+<p>There is a strange logic in financial markets. Precisely because your ability to earn outside the market is limited, you want to come into finance and look for new high-leverage, high-return opportunities through investing. And yet the big names in investing all tell you that your ability to earn outside the market is what matters most: you need a continuous stream of cash flow.</p>
+<p>And in fact, finance only amplifies returns on capital. It does not provide the source of capital itself. The impossible triangle in finance is:</p>
+<ul>
+<li>principal</li>
+<li>rate of return</li>
+<li>time</li>
+</ul>
+<p>If you have enough principal, even a low rate of return can still generate excellent results. With 1 million USD and a 10% annual return, you make 100,000 USD in a year. If you are willing to take extremely high risk, micro-cap meme tokens and 100x coins are the most direct path to high returns. Return is the compensation for taking risk.</p>
+<p>So if your principal is not large enough and you are not willing to take on that risk, then the only thing left that you can invest is time.</p>
+</div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.1"></script><script defer src="/js/highlight.min.js?v=v1.1"></script><script defer src="/js/main.js?v=v1.1"></script><script defer src="/js/lightbox.js?v=v1.1"></script><script defer src="/js/bootstrap.min.js?v=v1.1"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>

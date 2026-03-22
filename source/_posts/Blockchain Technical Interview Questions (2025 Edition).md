@@ -7,7 +7,7 @@ date: 2025-07-06 18:38:03
 draft_date: 2025-06-30 14:26:03
 ---
 
-Compared to the 2023 version of [Blockchain Technical Interview Questions](/2023/07/12/区块链技术面试题/), which focused more on a macro perspective, this edition leans slightly more toward engineering practice and includes more technical details. These two versions complement each other—they’re not upgrades. The questions here are purely based on my personal experience, just like many interviewers who only ask what they themselves know and won’t ask about things they don’t understand. So the scope and depth of these questions are inevitably limited by my own level of knowledge:
+Compared to the 2023 version of [Blockchain Technical Interview Questions](/2023/07/12/Blockchain Technology Interview Questions/), which focused more on a macro perspective, this edition leans slightly more toward engineering practice and includes more technical details. These two versions complement each other; they are not upgrades. The questions here are purely based on my personal experience, just like many interviewers who only ask what they themselves know and will not ask about things they do not understand. So the scope and depth of these questions are inevitably limited by my own level of knowledge:
 
 1. Why is the Ethereum client divided into execution layer and consensus layer?
 2. How does Ethereum's PoS process work, and how do you initialize a PoS network?

@@ -45,7 +45,7 @@ The targets and allocation proportions I chose are:
 
 (Updated on 2024.09.26)
 
-You can view this collection of coins in this public [Watchlist](https://coinmarketcap.com/watchlist/66d339a5c316be09d04b7b16/), which links to the CoinMarketCap website. You'll notice that nearly all of the coins have a market cap ranking within the top 100, following the fourth principle from “[Some Small Tips for Crypto Investing](/2024/05/04/炒币投资的小-tips/)”.
+You can view this collection of coins in this public [Watchlist](https://coinmarketcap.com/watchlist/66d339a5c316be09d04b7b16/), which links to the CoinMarketCap website. You will notice that nearly all of the coins have a market cap ranking within the top 100, following the fourth principle from [Some Small Tips for Crypto Investing](/2024/05/04/Small Tips for Cryptocurrency Investment/).
 
 In my DCA portfolio, BTC is always the top choice, making up 50% of the total allocation. Additionally, five PoW coins make up 20% of the portfolio, meaning PoW coins collectively account for 70%. Most PoW coins have a capped supply.
 

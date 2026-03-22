@@ -10,7 +10,7 @@ draft_date: 2025-06-24 18:36:25
 
 > This is a beginner-friendly series that starts from the very basics and teaches you how to develop Solana smart contracts. Due to space, only Part 1 is included here:
 > 
-> - “[Part 1](/2025/06/24/Solana智能合约开发入门教程1/)”: Install the base environment, deploy a HelloWorld contract, call an on-chain contract
+> - [Part 1](/2025/06/24/Solana Smart Contract Development Tutorial (1)/): Install the base environment, deploy a HelloWorld contract, call an on-chain contract
 > - “Part 2”: Implement the minimal model of a USDT-like contract; define custom data structures and methods
 > - “Part 3”: Reuse contract functionality with the official SPL library to issue a standardized token
 

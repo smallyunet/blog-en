@@ -1,0 +1,212 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>Continuation Tutorial: Understanding CPS</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2025/07/23/continuation/continuation-tutorial-1-understanding-cps/"><meta property="og:title" content="Continuation Tutorial: Understanding CPS"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2025/07/23/continuation/continuation-tutorial-1-understanding-cps/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.1"><link rel="stylesheet" href="/css/post.css?v=v1.1"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.1"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>Continuation Tutorial: Understanding CPS</h1><div class="time">2025-07-23</div><div class="title-margin"></div><blockquote>
+<p>This is a continuation tutorial series:</p>
+<ol>
+<li><a href="/2025/07/23/continuation-tutorial-1-understanding-cps/">Continuation Tutorial: Understanding CPS</a></li>
+<li><a href="/2025/07/23/continuation-tutorial-2-implementing-coroutine-scheduling-with-yield/">Continuation Tutorial: Implementing Coroutine Scheduling with yield</a></li>
+<li><a href="/2025/07/23/continuation-tutorial-3-implementing-coroutine-scheduling-with-call-cc/">Continuation Tutorial: Implementing Coroutine Scheduling with call&#x2F;cc</a></li>
+<li><a href="/2025/07/23/continuation-tutorial-4-implementing-coroutine-scheduling-with-shift-reset/">Continuation Tutorial: Implementing Coroutine Scheduling with shift&#x2F;reset</a></li>
+<li><a href="/2025/07/23/continuation-tutorial-5-exploring-the-racket-language/">Continuation Tutorial: Exploring the Racket Language</a></li>
+<li><a href="/2025/07/23/continuation-tutorial-6-implementing-preemptive-coroutine-scheduling/">Continuation Tutorial: Implementing Preemptive Coroutine Scheduling</a></li>
+</ol>
+</blockquote>
+<p>Let us study the principles of continuation and its application scenarios step by step, from shallow to deep. The content of this tutorial series is unrelated to Yin Wang’s continuation workshop. It is the result of my own learning and research, so there are no copyright concerns. That said, it is precisely because I took the foundation course and built a solid foundation that I knew how to study continuation on my own and understand the concept properly. This article will reveal a small portion of the skills learned in the foundation course, because continuation is advanced material relative to that course, and there is no way to understand it while skipping the foundational skills.</p>
+<h3 id="Recursion"><a href="#Recursion" class="headerlink" title="Recursion"></a>Recursion</h3><p>Let us first write a factorial function <code>fact</code> in recursive form. We are already very familiar with this style, so it does not need much explanation:</p>
+<pre><code class="js">function fact(n)
+&#123;
+  if (n === 0)
+  &#123;
+    return 1;
+  &#125;
+  else
+  &#123;
+    return n * fact(n - 1);
+  &#125;
+&#125;
+
+console.log(&quot;fact1=&quot;, fact(1)); // 1
+console.log(&quot;fact3=&quot;, fact(3)); // 6
+console.log(&quot;fact5=&quot;, fact(5)); // 120
+</code></pre>
+<h3 id="Tail-recursion"><a href="#Tail-recursion" class="headerlink" title="Tail recursion"></a>Tail recursion</h3><p>Next, rewrite the <code>fact</code> function in tail-recursive form. Tail recursion adds one more parameter than plain recursion. This new parameter is used to carry the value accumulated by each call:</p>
+<pre><code class="js">function factTail(n, prod)
+&#123;
+  if (n == 0)
+  &#123;
+    return prod;
+  &#125;
+  else
+  &#123;
+    return factTail(n - 1, prod * n);
+  &#125;
+&#125;
+
+console.log(&quot;factTail1=&quot;, factTail(1, 1)); // 1
+console.log(&quot;factTail3=&quot;, factTail(3, 1)); // 6
+console.log(&quot;factTail5=&quot;, factTail(5, 1)); // 120
+</code></pre>
+<h3 id="CPS-form"><a href="#CPS-form" class="headerlink" title="CPS form"></a>CPS form</h3><p>Based on the tail-recursive form of <code>fact</code>, let us add another parameter <code>k</code>. This <code>k</code> is a function. Instead of returning the computed value directly, <code>fact</code> passes the result to <code>k</code>, like this:</p>
+<pre><code class="js">function factTailCPS(n, prod, k)
+&#123;
+  if (n == 0)
+  &#123;
+    return k(prod);
+  &#125;
+  else
+  &#123;
+    return factTailCPS(n - 1, prod * n, k);
+  &#125;
+&#125;
+
+factTailCPS(1, 1, x =&gt; console.log(&quot;factTailCPS1=&quot;, x)); // 1
+factTailCPS(3, 1, x =&gt; console.log(&quot;factTailCPS3=&quot;, x)); // 6
+factTailCPS(5, 1, x =&gt; console.log(&quot;factTailCPS5=&quot;, x)); // 120
+</code></pre>
+<p>This <code>k</code> is the continuation. It tells the <code>fact</code> function how computation should continue after the result has been produced. No doubt about it: this function fully matches CPS, or Continuation-Passing Style.</p>
+<h3 id="Typical-CPS"><a href="#Typical-CPS" class="headerlink" title="Typical CPS"></a>Typical CPS</h3><p>However, using tail recursion together with a continuation parameter is clearly not concise enough, and it does not count as the typical CPS form. Typical CPS is harder to understand, so there is no need to derive it from scratch by yourself. Just look at this ready-made example, where we improve the recursive <code>fact</code> function:</p>
+<pre><code class="js">function factCPS(n, k)
+&#123;
+  if (n == 0)
+  &#123;
+    return k(1);
+  &#125;
+  else
+  &#123;
+    return factCPS(n - 1, r =&gt; k(n * r));
+  &#125;
+&#125;
+</code></pre>
+<p>This can feel a bit confusing at first, but do not panic. Let us break it down. First, <code>k</code> still represents the continuation, and <code>k</code> is a function. Then we call it like this:</p>
+<pre><code class="js">let factCPS1 = factCPS(0, x =&gt; x);
+console.log(&quot;factCPS1=&quot;, factCPS1); // 1
+
+let factCPS3 = factCPS(3, x =&gt; x);
+console.log(&quot;factCPS3=&quot;, factCPS3); // 6
+
+let factCPS5 = factCPS(5, x =&gt; x);
+console.log(&quot;factCPS5=&quot;, factCPS5); // 120
+</code></pre>
+<p>The key is that when calling the function, the second argument is <code>x =&gt; x</code>. Once you combine that with the <code>r =&gt; k(n * r)</code> inside the function, it is very easy to get lost.</p>
+<p>This really is the hardest part to understand. Let us use the factorial of 2 as an example and write out the step-by-step execution of <code>factCPS</code>. The technique used here is single-step substitution, which is taught in the very first lesson of the foundation course and is extremely helpful for understanding recursion. If you have been trained in the foundation course and built a solid base, it truly helps when you move on to more complex things, such as the CPS calls here:</p>
+<pre><code class="js">let factCPS2 = factCPS(2, x =&gt; x);
+console.log(&quot;factCPS2=&quot;, factCPS2); // 2
+
+// n=2, k=x=&gt;x, return factCPS(1, r =&gt; k(2 * r));
+  // n=1, k=r=&gt;(x=&gt;x)(2*r), return factCPS(0, r =&gt; k(1 * r));
+    // n=0, k=r=&gt;(r=&gt;(x=&gt;x)(2*r)(1*r)), return k(1);
+      // k(1) = r=&gt;(x=&gt;x)(2*r)(1*1)
+      //      = (x=&gt;x)(2)
+      //      = 2
+</code></pre>
+<p>Even though I have already broken it down according to the correct line of reasoning, it is still very hard to understand from the reader’s perspective. Try unpacking it yourself and gradually understand how typical CPS executes. It is normal if it takes several hours to really understand these steps.</p>
+<p>To summarize: each CPS call uses a closure to store the value computed at the current step. Tail recursion passes values directly through parameters, while CPS passes the value of the next step through a closure. That is the relationship between them. Of course, to understand this, you first need to know what a closure is. That is also a major focus of the foundation course, especially in the interpreter section where you implement the constructs for closures yourself. That gives you a very thorough understanding of closures.</p>
+<h3 id="CPS-for-the-fib-function"><a href="#CPS-for-the-fib-function" class="headerlink" title="CPS for the fib function"></a>CPS for the fib function</h3><p>The factorial function <code>fact</code> has one characteristic: it makes only one recursive call in the function body. Now let us look at the Fibonacci function <code>fib</code>, which makes two recursive calls in the function body. How should CPS handle that case?</p>
+<p>The recursive definition of <code>fib</code> looks like this:</p>
+<pre><code class="js">function fib(n)
+&#123;
+  if (n == 0)
+  &#123;
+    return 0;
+  &#125;
+  else if (n == 1)
+  &#123;
+    return 1;
+  &#125;
+  else
+  &#123;
+    return fib(n - 1) + fib(n - 2);
+  &#125;
+&#125;
+
+console.log(&quot;fib(2)=&quot;, fib(2)); // 1
+console.log(&quot;fib(5)=&quot;, fib(5)); // 5
+</code></pre>
+<p>Here is the CPS version of <code>fib</code>. Then we can look at how it works:</p>
+<pre><code class="js">function fibCPS(n, k)
+&#123;
+  if (n == 0)
+  &#123;
+    return k(0);
+  &#125;
+  else if (n == 1)
+  &#123;
+    return k(1);
+  &#125;
+  else
+  &#123;
+    return fibCPS(n - 1, r1 =&gt; fibCPS(n - 2, r2 =&gt; k(r1 + r2)));
+  &#125;
+&#125;
+</code></pre>
+<p>As you can see, when two recursive calls are needed, CPS places the other recursive call inside the original <code>r =&gt; k(r)</code> function, so the second internal call becomes a subcall during the recursive call to <code>fib</code>.</p>
+<p>The CPS form of <code>fib</code> is called like this:</p>
+<pre><code class="js">let fibCPS1 = fibCPS(1, x =&gt; x);
+console.log(&quot;fibCPS1=&quot;, fibCPS1); // 1
+
+let fibCPS2 = fibCPS(2, x =&gt; x);
+console.log(&quot;fibCPS2=&quot;, fibCPS2); // 1
+
+let fibCPS4 = fibCPS(4, x =&gt; x);
+console.log(&quot;fibCPS4=&quot;, fibCPS4); // 3
+
+let fibCPS5 = fibCPS(5, x =&gt; x);
+console.log(&quot;fibCPS5=&quot;, fibCPS5); // 5
+</code></pre>
+<p>Let us use the Fibonacci number of 3 as an example and break down the exact execution steps. One thing to note is that this process is extremely complex, much more complex than the <code>fact</code> function. You really need to write it out yourself to fully understand it:</p>
+<pre><code class="js">let fibCPS3 = fibCPS(3, x =&gt; x);
+console.log(&quot;fibCPS3=&quot;, fibCPS3); // 1+1=2
+
+// n=3, k=x=&gt;x,
+       // return fibCPS(2, r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)));
+// n=2, k=r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)),
+       // return fibCPS(1, r1 =&gt; fibCPS(0, r2 =&gt; (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(r1+r2)));
+// n=1, k=r1 =&gt; fibCPS(0, r2 =&gt; (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(r1+r2)),
+       // return k(1)
+       // return (r1 =&gt; fibCPS(0, r2 =&gt; (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(r1+r2)))(1)
+       // return fibCPS(0, r2 =&gt; (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(1+r2))
+          // n=0, k=r2 =&gt; (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(1+r2)
+              // return k(0)
+              // return (r2 =&gt; (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(1+r2))(0)
+              // return (r1 =&gt; fibCPS(1, r2 =&gt; (x=&gt;x)(r1+r2)))(1+0)
+              // return fibCPS(1, r2 =&gt; (x=&gt;x)(1+r2))
+                  // n=1, k=r2 =&gt; (x=&gt;x)(1+r2)
+                  // return k(1)
+                  // return (x=&gt;x)(1+1)
+                  // return 2
+</code></pre>
+<p>After working through <code>fact</code> and <code>fib</code>, we now know what CPS looks like and how its execution proceeds step by step. Understanding CPS is only the beginning. Next, we will use continuation to build more interesting programs.</p>
+<h3 id="Exercise"><a href="#Exercise" class="headerlink" title="Exercise"></a>Exercise</h3><p>Suppose we have a recursive <code>sumFrom</code> function that takes two parameters, <code>a</code> and <code>b</code>. Its job is to compute the value of <code>a+(a+1)+...+(b-1)+b</code>. For example, when the parameters are <code>1</code> and <code>4</code>, it computes <code>1+2+3+4</code>:</p>
+<pre><code class="js">function sumFrom(a, b)
+&#123;
+  if (a == b)
+  &#123;
+    return a;
+  &#125;
+  else
+  &#123;
+    return b + sumFrom(a, b - 1);
+  &#125;
+&#125;
+
+console.log(sumFrom(1, 3)); // 6
+console.log(sumFrom(2, 5)); // 14
+</code></pre>
+<p>The exercise is to transform <code>sumFrom</code> into CPS form. Fill in the blank in the <code>sumFromCPS</code> function so that the program matches the output in the test cases:</p>
+<pre><code class="js">function sumFromCPS(a, b, k)
+&#123;
+  // ____
+&#125;
+
+sumFromCPS(1, 3, x =&gt; console.log(x)); // 6
+sumFromCPS(2, 5, x =&gt; console.log(x)); // 14
+</code></pre>
+<h3 id="Further-reading"><a href="#Further-reading" class="headerlink" title="Further reading"></a>Further reading</h3><p>We have now experienced the process of manually transforming a recursive program into CPS form. In practice, there are also methods that can automatically transform code into CPS, which is what the legendary “Yin Wang 40 lines of code” is doing. You can refer to these two links for more:</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/20822815">Is Yin Wang’s “40 lines of code” really as impressive as he says?</a></li>
+<li><a href="https://www.yinwang.org/blog-cn/2012/07/04/dan-friedman">GTF - Great Teacher Friedman</a></li>
+</ul>
+<p>Because automatic CPS transformation is fairly difficult, I do not plan to study or implement it myself.</p>
+</div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.1"></script><script defer src="/js/highlight.min.js?v=v1.1"></script><script defer src="/js/main.js?v=v1.1"></script><script defer src="/js/lightbox.js?v=v1.1"></script><script defer src="/js/bootstrap.min.js?v=v1.1"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>

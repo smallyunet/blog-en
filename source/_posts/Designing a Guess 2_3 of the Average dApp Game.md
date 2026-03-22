@@ -74,7 +74,7 @@ I believe this is a sound design.
 
 ### Update (2025-04-22)
 
-Over a year ago I wrote “[‘Guess 2/3 of the Average’ dApp Game Design](/2022/12/27/“猜均值的2-3”dApp-游戏设计/)”.
+Over a year ago I wrote ["Guess 2/3 of the Average" dApp Game Design](/2022/12/27/Designing a Guess 2_3 of the Average dApp Game/).
 
 Thanks to modern ChatGPT, implementing the game is now easy; contract and front-end are quick to build. I spent only two hours today to create a demo page.
 

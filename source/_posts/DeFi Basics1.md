@@ -6,7 +6,7 @@ tags: DeFi
 ---
 
 > This is a DeFi tutorial series aimed at learning and understanding DeFi concepts and principles through hands-on practice. Due to space constraints, only Part 1 is included here:
-> 1. [DeFi Basics: Understanding the AMM Pricing Mechanism](/2025/08/20/DeFi基础1/)
+> 1. [DeFi Basics: Understanding the AMM Pricing Mechanism](/2025/08/20/DeFi Basics1/)
 > 2. DeFi Basics: Oracles and Price Feeds
 > 3. DeFi Basics: Lending and Liquidation
 > 4. DeFi Advanced: Flash Loans and Arbitrage

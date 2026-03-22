@@ -1,12 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><title>Guess 2/3 of the Average dApp Game Design</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
-</head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
-  document.body.classList.add('mobile')
-  var navbar = document.querySelector('nav.navbar');
-  if (navbar) {
-    navbar.classList.remove('navbar-fixed-top');
-  }
-}
-</script><div><div class="inner"><h1>Guess 2/3 of the Average dApp Game Design</h1><div class="time">2022-12-27</div><div class="title-margin"></div><p><a href="https://zh.m.wikipedia.org/zh-cn/%E7%8C%9C%E5%9D%87%E5%80%BC%E7%9A%842/3">Guess 2&#x2F;3 of the Average</a> is a classic game-theory exercise. This post adapts it into a blockchain-based dApp. The basic rules are:</p>
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>Guess 2/3 of the Average dApp Game Design</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2022/12/27/Designing a Guess 2_3 of the Average dApp Game/"><meta property="og:title" content="Guess 2/3 of the Average dApp Game Design"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2022/12/27/Designing a Guess 2_3 of the Average dApp Game/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.1"><link rel="stylesheet" href="/css/post.css?v=v1.1"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.1"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>Guess 2/3 of the Average dApp Game Design</h1><div class="time">2022-12-27</div><div class="title-margin"></div><p><a href="https://zh.m.wikipedia.org/zh-cn/%E7%8C%9C%E5%9D%87%E5%80%BC%E7%9A%842/3">Guess 2&#x2F;3 of the Average</a> is a classic game-theory exercise. This post adapts it into a blockchain-based dApp. The basic rules are:</p>
 <ol>
 <li>A player pays <strong>any amount</strong> to join a round.  </li>
 <li>Sum the <strong>total amount</strong> paid by all players.  </li>
@@ -57,7 +50,7 @@
 <p>Although the distribution is not perfectly normal, it meets the goal: rounds finish at random yet reasonable times, avoiding too-few or too-many participants while still allowing a small chance (up to ~500 players).</p>
 <p>I believe this is a sound design.</p>
 <p><br/><br/></p>
-<h3 id="Update-2025-04-22"><a href="#Update-2025-04-22" class="headerlink" title="Update (2025-04-22)"></a>Update (2025-04-22)</h3><p>Over a year ago I wrote “<a href="/2022/12/27/%E2%80%9C%E7%8C%9C%E5%9D%87%E5%80%BC%E7%9A%842-3%E2%80%9DdApp-%E6%B8%B8%E6%88%8F%E8%AE%BE%E8%AE%A1/">‘Guess 2&#x2F;3 of the Average’ dApp Game Design</a>”.</p>
+<h3 id="Update-2025-04-22"><a href="#Update-2025-04-22" class="headerlink" title="Update (2025-04-22)"></a>Update (2025-04-22)</h3><p>Over a year ago I wrote [“Guess 2&#x2F;3 of the Average” dApp Game Design](&#x2F;2022&#x2F;12&#x2F;27&#x2F;Designing a Guess 2_3 of the Average dApp Game&#x2F;).</p>
 <p>Thanks to modern ChatGPT, implementing the game is now easy; contract and front-end are quick to build. I spent only two hours today to create a demo page.</p>
 <p>Play here: <a href="https://guessavg.oiia.network/">https://guessavg.oiia.network/</a></p>
 <p>Some notes:</p>
@@ -81,7 +74,7 @@
 <li>You need ETH on Base to play.  </li>
 <li>The game is easier now; a round ends after only two or three players.</li>
 </ol>
-</div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-Y7C0CVX9PK"></script><script>window.dataLayer = window.dataLayer || [];
+</div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.1"></script><script defer src="/js/highlight.min.js?v=v1.1"></script><script defer src="/js/main.js?v=v1.1"></script><script defer src="/js/lightbox.js?v=v1.1"></script><script defer src="/js/bootstrap.min.js?v=v1.1"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-Y7C0CVX9PK');</script></html>
+gtag('config', 'G-5JRBZ6P1W3');</script></html>
