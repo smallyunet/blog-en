@@ -1,0 +1,827 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>Why Can Solana List Token Holders While Ethereum Cannot?</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2026/10/06/why-solana-can-list-token-holders-and-ethereum-cannot/"><meta property="og:title" content="Why Can Solana List Token Holders While Ethereum Cannot?"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2026/10/06/why-solana-can-list-token-holders-and-ethereum-cannot/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.2"><link rel="stylesheet" href="/css/post.css?v=v1.2"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.2"><link rel="stylesheet" href="/css/ai-content.css?v=5"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>Why Can Solana List Token Holders While Ethereum Cannot?</h1><div class="time">2026-10-06</div><div class="title-margin"></div><div class="ai-content"><p>This looks like a simple question.</p>
+<p>Given a token such as USDC, we want to know:</p>
+<blockquote>
+<p>Which addresses hold it right now, and how much does each address hold?</p>
+</blockquote>
+<p>On Solana, this is a relatively natural thing to do.</p>
+<p>For a standard SPL token, we can filter the token accounts owned by the Token Program by mint, retrieve the accounts associated with that token, and read their owner and amount fields.</p>
+<p>On Ethereum, however, a standard ERC-20 contract does not have a capability like:</p>
+<pre><code class="text">getAllHolders()
+</code></pre>
+<p>What the ERC-20 standard provides is:</p>
+<pre><code class="solidity">balanceOf(address owner)
+</code></pre>
+<p>In other words:</p>
+<blockquote>
+<p>Give me an address, and I will tell you how many tokens it holds.</p>
+</blockquote>
+<p>But it does not provide:</p>
+<blockquote>
+<p>Tell me every address with a balance.</p>
+</blockquote>
+<p>Of course, Etherscan, Alchemy, and other indexers can still provide holder lists.</p>
+<p>They usually do this by scanning historical <code>Transfer</code> events, continuously maintaining balances, and reconstructing the list off-chain.</p>
+<p>That is different from enumerating holders directly from the current on-chain state.</p>
+<p>Why do two chains handle the same concept—a token—so differently?</p>
+<p>The answer is not simply that SPL provides one more interface than ERC-20.</p>
+<p>Keep digging, and the question leads to the fundamentally different state models of Solana and Ethereum, and their different answers to the question: what kind of computer should a blockchain be?</p>
+<hr>
+<h2 id="Layer-1-Solana-Can-Query-the-List-Ethereum-Cannot-Query-It-Directly"><a href="#Layer-1-Solana-Can-Query-the-List-Ethereum-Cannot-Query-It-Directly" class="headerlink" title="Layer 1: Solana Can Query the List; Ethereum Cannot Query It Directly"></a>Layer 1: Solana Can Query the List; Ethereum Cannot Query It Directly</h2><p>Start with the most visible difference.</p>
+<p>The balances in a typical ERC-20 can be understood as:</p>
+<pre><code class="solidity">mapping(address =&gt; uint256) balances;
+</code></pre>
+<p>For example:</p>
+<pre><code class="text">balances[Alice] = 100
+balances[Bob]   = 200
+balances[Carol] = 50
+</code></pre>
+<p>The data model looks roughly like this:</p>
+<pre><code class="text">USDC Contract
+│
+└── balances
+    ├── Alice → 100
+    ├── Bob   → 200
+    └── Carol → 50
+</code></pre>
+<p>The problem is that a Solidity <code>mapping</code> is not inherently enumerable.</p>
+<p>If we already know Alice’s address, we can query:</p>
+<pre><code class="text">Alice → 100
+</code></pre>
+<p>But if all we know is:</p>
+<pre><code class="text">USDC Contract = 0x...
+</code></pre>
+<p>The EVM has no native operation that answers:</p>
+<pre><code class="text">How many keys are in balances?
+What are those keys?
+</code></pre>
+<p>So ERC-20 can easily answer:</p>
+<blockquote>
+<p>How much USDC does Alice have?</p>
+</blockquote>
+<p>But it cannot directly answer:</p>
+<blockquote>
+<p>Who owns USDC?</p>
+</blockquote>
+<hr>
+<p>Solana’s token model is different.</p>
+<p>An SPL token’s balances are usually not stored inside a Token Program in an:</p>
+<pre><code class="text">owner → balance
+</code></pre>
+<p>mapping.</p>
+<p>Instead, they are stored in separate token accounts.</p>
+<p>For example:</p>
+<pre><code class="text">USDC Mint
+│
+├── Token Account A
+│   ├── mint   = USDC
+│   ├── owner  = Alice
+│   └── amount = 100
+│
+├── Token Account B
+│   ├── mint   = USDC
+│   ├── owner  = Bob
+│   └── amount = 200
+│
+└── Token Account C
+    ├── mint   = USDC
+    ├── owner  = Carol
+    └── amount = 50
+</code></pre>
+<p>Querying holders can therefore become:</p>
+<pre><code class="text">Accounts owned by the Token Program
+        ↓
+Filter mint == USDC
+        ↓
+Filter amount &gt; 0
+        ↓
+Aggregate by owner
+        ↓
+Holder List
+</code></pre>
+<p>There is another important detail:</p>
+<blockquote>
+<p>A token account is not the same thing as a wallet.</p>
+</blockquote>
+<p>One wallet can own multiple token accounts for the same mint, so the results still need to be aggregated by owner.</p>
+<p>But the key difference is already visible:</p>
+<blockquote>
+<p>On Ethereum, a token balance is usually state inside a contract. On Solana, a token balance is explicitly represented by a separate account.</p>
+</blockquote>
+<hr>
+<h2 id="Layer-2-Is-the-Difference-About-Stacks-and-Heaps"><a href="#Layer-2-Is-the-Difference-About-Stacks-and-Heaps" class="headerlink" title="Layer 2: Is the Difference About Stacks and Heaps?"></a>Layer 2: Is the Difference About Stacks and Heaps?</h2><p>At this point, a plausible explanation may come to mind.</p>
+<p>Contract execution on Ethereum must be deterministic.</p>
+<p>Every node executing the same transaction must obtain exactly the same result.</p>
+<p>For example:</p>
+<pre><code class="solidity">mapping(address =&gt; uint256) balances;
+</code></pre>
+<p>The location associated with Alice is deterministic.</p>
+<p>Could the problem be that the EVM lacks the persistent heap of a conventional program—a structure that can grow dynamically and organize objects through pointers—and therefore cannot maintain a dynamic, enumerable set of holders?</p>
+<p>Conversely, could Solana know about every token account because it supports a more flexible dynamic heap?</p>
+<p>The answer is:</p>
+<p><strong>No.</strong></p>
+<p>We first need to distinguish two very different concepts:</p>
+<pre><code class="text">Memory used while a program executes
+</code></pre>
+<p>And:</p>
+<pre><code class="text">Persistent state on the blockchain
+</code></pre>
+<hr>
+<h3 id="The-EVM’s-Persistent-State-Is-Not-Its-Stack"><a href="#The-EVM’s-Persistent-State-Is-Not-Its-Stack" class="headerlink" title="The EVM’s Persistent State Is Not Its Stack"></a>The EVM’s Persistent State Is Not Its Stack</h3><p>The EVM does have a stack when it executes a program.</p>
+<p>It also has memory.</p>
+<p>But both belong to the temporary environment of a single execution.</p>
+<p>In simplified form:</p>
+<pre><code class="text">EVM
+
+Stack
+  → Temporary
+  → Disappears when execution ends
+
+Memory
+  → Temporary
+  → Disappears when execution ends
+
+Storage
+  → Persistent
+  → Written into on-chain state
+</code></pre>
+<p>In an ERC-20 contract:</p>
+<pre><code class="solidity">mapping(address =&gt; uint256) balances;
+</code></pre>
+<p>If this is a state variable, it lives in:</p>
+<pre><code class="text">Contract Storage
+</code></pre>
+<p>Not in the stack.</p>
+<p>Nor can a <code>mapping</code> be accessed deterministically because it belongs to some kind of stack structure.</p>
+<p>It uses deterministic storage addressing.</p>
+<p>Conceptually, we can think of it as:</p>
+<pre><code class="text">storage_location
+=
+keccak256(key, mapping_slot)
+</code></pre>
+<p>So:</p>
+<pre><code class="text">Alice
+   ↓
+Deterministic calculation
+   ↓
+A Storage Slot
+
+Bob
+   ↓
+Deterministic calculation
+   ↓
+Another Storage Slot
+</code></pre>
+<p>Given the same key and the same contract state, every node obtains the same storage location.</p>
+<p>But this still does not provide:</p>
+<pre><code class="text">enumerate all keys
+</code></pre>
+<p>Because the data structure is designed for:</p>
+<pre><code class="text">key → value
+</code></pre>
+<p>Not:</p>
+<pre><code class="text">all keys → values
+</code></pre>
+<hr>
+<h3 id="Solana-Does-Not-Have-a-Persistent-Heap-Either"><a href="#Solana-Does-Not-Have-a-Persistent-Heap-Either" class="headerlink" title="Solana Does Not Have a Persistent Heap Either"></a>Solana Does Not Have a Persistent Heap Either</h3><p>A Solana program can certainly use dynamic memory while executing.</p>
+<p>For example, Rust allows:</p>
+<pre><code class="rust">let mut orders = Vec::new();
+orders.push(order);
+</code></pre>
+<p>These objects can live on the heap during execution.</p>
+<p>But once the transaction finishes, this runtime memory disappears too.</p>
+<p>Solana does not permanently preserve a process-memory structure like:</p>
+<pre><code class="text">pointer
+  ↓
+heap object
+  ↓
+pointer
+  ↓
+another heap object
+</code></pre>
+<p>on the blockchain as it is.</p>
+<p>What can actually persist is:</p>
+<pre><code class="text">Account.data
+</code></pre>
+<p>A deterministic sequence of bytes associated with an account.</p>
+<p>For example:</p>
+<pre><code class="text">Account A
+data = [01 03 7A ...]
+
+Account B
+data = [92 FF 18 ...]
+</code></pre>
+<p>A program can take:</p>
+<pre><code class="rust">struct Position &#123;
+    owner: Pubkey,
+    amount: u64,
+    orders: Vec&lt;Order&gt;,
+&#125;
+</code></pre>
+<p>serialize it, and write it into <code>Account.data</code>.</p>
+<p>If there is not enough space, the account can be expanded.</p>
+<p>But what ultimately persists on-chain is still just:</p>
+<pre><code class="text">deterministic bytes
+</code></pre>
+<p>Not a long-lived heap.</p>
+<p>From the perspective of deterministic execution:</p>
+<pre><code class="text">Ethereum
+and
+Solana
+</code></pre>
+<p>are not fundamentally different.</p>
+<p>Both must satisfy:</p>
+<pre><code class="text">Same previous state
++
+Same transaction
+=
+Same new state
+</code></pre>
+<hr>
+<h3 id="The-Holder-Difference-Is-Not-Caused-by-Stacks-or-Heaps"><a href="#The-Holder-Difference-Is-Not-Caused-by-Stacks-or-Heaps" class="headerlink" title="The Holder Difference Is Not Caused by Stacks or Heaps"></a>The Holder Difference Is Not Caused by Stacks or Heaps</h3><p>This is an important step.</p>
+<p>We can rule out a plausible-sounding explanation:</p>
+<blockquote>
+<p>Solana can enumerate holders not because it has a dynamic persistent heap that the EVM lacks.</p>
+</blockquote>
+<p>Neither chain has such a thing.</p>
+<p>The real difference is:</p>
+<blockquote>
+<p><strong>How persistent state is organized.</strong></p>
+</blockquote>
+<p>Ethereum chooses:</p>
+<pre><code class="text">Contract
+    ↓
+Storage Namespace
+    ↓
+mapping / array / struct
+</code></pre>
+<p>For example:</p>
+<pre><code class="text">USDC Contract
+    ↓
+balances mapping
+    ↓
+Alice → 100
+Bob   → 200
+</code></pre>
+<p>Alice’s and Bob’s balances are not independent token-balance objects in Ethereum’s state.</p>
+<p>They are values inside the USDC contract’s storage.</p>
+<p>Solana chooses:</p>
+<pre><code class="text">Program
++
+Many independent Accounts
+</code></pre>
+<p>SPL Token can therefore define:</p>
+<pre><code class="text">Token Program
+
+Token Account A
+mint   = USDC
+owner  = Alice
+amount = 100
+
+Token Account B
+mint   = USDC
+owner  = Bob
+amount = 200
+</code></pre>
+<p>The real dividing line is not:</p>
+<pre><code class="text">Stack vs Heap
+</code></pre>
+<p>It is:</p>
+<pre><code class="text">Contract-internal Storage
+        vs
+Explicit State Accounts
+</code></pre>
+<hr>
+<h2 id="Layer-3-Why-Can-SPL-Token-Be-Designed-This-Way"><a href="#Layer-3-Why-Can-SPL-Token-Be-Designed-This-Way" class="headerlink" title="Layer 3: Why Can SPL Token Be Designed This Way?"></a>Layer 3: Why Can SPL Token Be Designed This Way?</h2><p>This raises another question:</p>
+<p>Why does Solana make a token balance into a separate token account?</p>
+<p>Why does it not simply maintain a:</p>
+<pre><code class="text">wallet → balance
+</code></pre>
+<p>mapping inside the Token Program, as ERC-20 does?</p>
+<p>The answer is:</p>
+<p>A token account is just one application of Solana’s underlying account model.</p>
+<p>On Solana, an account is a first-class object at the system level.</p>
+<p>An account roughly contains:</p>
+<pre><code class="text">address
+owner
+lamports
+data
+executable
+</code></pre>
+<p>The most important field here is:</p>
+<pre><code class="text">data
+</code></pre>
+<p>It is a sequence of bytes interpreted by the program that owns the account.</p>
+<p>More importantly:</p>
+<p><strong>Solana programs themselves are essentially stateless.</strong></p>
+<p>Mutable state lives in separate data accounts.</p>
+<p>A DEX can therefore look like:</p>
+<pre><code class="text">DEX Program
+│
+├── Pool Account
+├── Position Account A
+├── Position Account B
+├── Vault Account
+└── ...
+</code></pre>
+<p>The program stores code.</p>
+<p>The accounts store state.</p>
+<p>SPL Token naturally takes this form too:</p>
+<pre><code class="text">Token Program
+│
+├── Mint Account
+├── Alice Token Account
+├── Bob Token Account
+└── Carol Token Account
+</code></pre>
+<p>More precisely:</p>
+<blockquote>
+<p>Solana does not natively hard-code holder queries into its runtime.</p>
+</blockquote>
+<p>What actually happens is:</p>
+<pre><code class="text">Solana natively provides an Account Model
++
+The Token Program standardizes token balances as Accounts
+</code></pre>
+<p>Together, these make holder enumeration a natural operation.</p>
+<hr>
+<h2 id="Layer-4-Why-Does-the-EVM-Lack-a-Similar-Concept"><a href="#Layer-4-Why-Does-the-EVM-Lack-a-Similar-Concept" class="headerlink" title="Layer 4: Why Does the EVM Lack a Similar Concept?"></a>Layer 4: Why Does the EVM Lack a Similar Concept?</h2><p>Ethereum’s core abstraction is closer to:</p>
+<pre><code class="text">Contract
+│
+├── Code
+└── Storage
+</code></pre>
+<p>A contract has its own persistent storage.</p>
+<p>Developers can define whatever they need:</p>
+<pre><code class="solidity">mapping(address =&gt; uint256) balances;
+
+mapping(address =&gt; Position) positions;
+
+mapping(bytes32 =&gt; Order) orders;
+</code></pre>
+<p>For a developer, this is straightforward.</p>
+<p>For example, storing a balance requires:</p>
+<pre><code class="solidity">balances[user] = 100;
+</code></pre>
+<p>And that is it.</p>
+<p>The developer does not need to:</p>
+<pre><code class="text">Create a Balance Account
+Allocate space
+Specify an owner
+Pass the Account into the transaction
+Validate the Account
+Serialize the Account
+</code></pre>
+<p>The EVM hides these details.</p>
+<p>But that also comes at a cost.</p>
+<p>What the EVM runtime sees is only:</p>
+<pre><code class="text">Contract
++
+Storage Slots
+</code></pre>
+<p>It does not know:</p>
+<pre><code class="text">This slot is a Token Balance
+That slot is a Position
+Another slot is an Order
+</code></pre>
+<p>Those meanings belong entirely to the smart contract.</p>
+<p>ERC-20 is merely an application-level convention:</p>
+<pre><code class="text">If a Contract implements:
+balanceOf()
+transfer()
+approve()
+...
+
+We interpret it as a Token.
+</code></pre>
+<p>The EVM itself does not know:</p>
+<blockquote>
+<p>There is a system object called a token here.</p>
+</blockquote>
+<p>Still less does it know:</p>
+<blockquote>
+<p>There is a type of object called a token holder here.</p>
+</blockquote>
+<p>Naturally, it cannot inherently provide a system capability such as:</p>
+<pre><code class="text">getAllTokenHolders()
+</code></pre>
+<hr>
+<h2 id="Layer-5-Why-Does-Solana-Make-Accounts-First-Class-Citizens"><a href="#Layer-5-Why-Does-Solana-Make-Accounts-First-Class-Citizens" class="headerlink" title="Layer 5: Why Does Solana Make Accounts First-Class Citizens?"></a>Layer 5: Why Does Solana Make Accounts First-Class Citizens?</h2><p>Now the question finally reaches the heart of Solana’s design.</p>
+<p>Why is Solana willing to accept so much complexity and split state into many independent accounts?</p>
+<p>One very important answer is:</p>
+<h1 id="To-Enable-Parallel-Execution"><a href="#To-Enable-Parallel-Execution" class="headerlink" title="To Enable Parallel Execution."></a>To Enable Parallel Execution.</h1><p>Suppose we have two transactions:</p>
+<pre><code class="text">Transaction A:
+read  Account 1
+write Account 2
+
+Transaction B:
+read  Account 3
+write Account 4
+</code></pre>
+<p>If the runtime knows this before execution begins, it can immediately see:</p>
+<pre><code class="text">A and B have no state conflicts
+</code></pre>
+<p>It can then execute:</p>
+<pre><code class="text">Transaction A ─────→ CPU Core 1
+
+Transaction B ─────→ CPU Core 2
+</code></pre>
+<p>at the same time.</p>
+<p>If, instead:</p>
+<pre><code class="text">Transaction A:
+write Account X
+
+Transaction B:
+write Account X
+</code></pre>
+<p>The runtime can also know in advance:</p>
+<pre><code class="text">There is a write conflict
+</code></pre>
+<p>So they cannot run in parallel.</p>
+<p>This requires a crucial prerequisite:</p>
+<blockquote>
+<p>A transaction must declare in advance which state it will access.</p>
+</blockquote>
+<p>That is a core feature of Solana’s instruction model.</p>
+<p>An instruction does not merely say:</p>
+<pre><code class="text">I want to call Program X
+</code></pre>
+<p>It must also tell the runtime:</p>
+<pre><code class="text">I want to access Account A
+I want to access Account B
+I want to write to Account C
+</code></pre>
+<p>The runtime can then build state dependencies resembling:</p>
+<pre><code class="text">Read Set
+Write Set
+</code></pre>
+<p>An account naturally becomes:</p>
+<pre><code class="text">A unit of state sharding
++
+The granularity of locking
++
+A unit of parallel scheduling
+</code></pre>
+<p>This gives us the following chain of reasoning:</p>
+<pre><code class="text">Accounts are first-class citizens
+        ↓
+Programs and State are separate
+        ↓
+Transactions explicitly declare Accounts
+        ↓
+The runtime knows state dependencies in advance
+        ↓
+Conflict detection
+        ↓
+Parallel scheduling
+</code></pre>
+<p>And:</p>
+<pre><code class="text">Conveniently querying Token Holders
+</code></pre>
+<p>is just one consequence of this architecture.</p>
+<hr>
+<h2 id="Layer-6-Why-Is-This-Kind-of-Parallelism-Difficult-for-the-EVM"><a href="#Layer-6-Why-Is-This-Kind-of-Parallelism-Difficult-for-the-EVM" class="headerlink" title="Layer 6: Why Is This Kind of Parallelism Difficult for the EVM?"></a>Layer 6: Why Is This Kind of Parallelism Difficult for the EVM?</h2><p>Now consider the EVM again.</p>
+<p>Suppose Alice calls Contract A:</p>
+<pre><code class="text">Alice
+  ↓
+Contract A
+</code></pre>
+<p>Before execution begins, we may not know which state the transaction will ultimately touch.</p>
+<p>Execution could unfold like this:</p>
+<pre><code class="text">Contract A
+    ↓
+Read Storage
+    ↓
+Decide whether to call Contract B based on the result
+    ↓
+Contract B calls Contract C
+    ↓
+Read other Storage
+    ↓
+Finally modify some state
+</code></pre>
+<p>Even the address of a contract being called may be determined dynamically at runtime.</p>
+<p>The EVM is therefore closer to:</p>
+<pre><code class="text">Start execution
+    ↓
+Run the program
+    ↓
+Gradually discover which state must be accessed
+</code></pre>
+<p>Solana is closer to:</p>
+<pre><code class="text">Declare Accounts first
+    ↓
+Establish state dependencies
+    ↓
+Then execute
+</code></pre>
+<p>The order is almost exactly reversed.</p>
+<p>That does not justify saying:</p>
+<blockquote>
+<p>The EVM can never execute in parallel.</p>
+</blockquote>
+<p>Modern EVM clients can certainly use speculative execution, conflict detection, parallel pre-execution, and other optimizations.</p>
+<p>The real issue is:</p>
+<blockquote>
+<p>The classic EVM state model does not require transactions to explicitly declare their complete read sets and write sets before execution.</p>
+</blockquote>
+<p>Deterministic parallel scheduling ahead of execution is therefore much harder.</p>
+<p>From the architectural design stage, Solana chose:</p>
+<blockquote>
+<p>To make developers and the runtime share this complexity.</p>
+</blockquote>
+<hr>
+<h2 id="Layer-7-Solana’s-Performance-Is-Not-Free"><a href="#Layer-7-Solana’s-Performance-Is-Not-Free" class="headerlink" title="Layer 7: Solana’s Performance Is Not Free"></a>Layer 7: Solana’s Performance Is Not Free</h2><p>We can now understand an often-overlooked point:</p>
+<p><strong>Solana’s high performance is not simply a matter of code running faster.</strong></p>
+<p>It changes the smart contract programming model.</p>
+<p>In the EVM, a developer can often write:</p>
+<pre><code class="solidity">balances[user] += 100;
+</code></pre>
+<p>On Solana, a similar application may need to explicitly handle:</p>
+<pre><code class="text">Program
+User Account
+Position Account
+Pool Account
+Vault Account
+Token Account
+Token Program
+System Program
+...
+</code></pre>
+<p>These accounts also involve:</p>
+<pre><code class="text">Creation
+Space allocation
+Passing them into the Transaction
+Owner validation
+PDA validation
+Serialization
+Deserialization
+Handling Account Locks
+</code></pre>
+<p>Complex DeFi transactions therefore often carry long account lists.</p>
+<p>This is not an accidental API design problem.</p>
+<p>Solana deliberately exposes some state-management complexity that a virtual machine would otherwise hide.</p>
+<p>Why?</p>
+<p>Because the runtime needs to know:</p>
+<pre><code class="text">What will you read?
+What will you write?
+</code></pre>
+<p>Only then can it be more proactive about:</p>
+<pre><code class="text">locking
+scheduling
+parallel execution
+</code></pre>
+<p>We can therefore understand Solana’s design as:</p>
+<blockquote>
+<p><strong>Trading development complexity for runtime predictability and parallel execution.</strong></p>
+</blockquote>
+<hr>
+<h2 id="Layer-8-Ethereum-Chose-a-Different-Direction"><a href="#Layer-8-Ethereum-Chose-a-Different-Direction" class="headerlink" title="Layer 8: Ethereum Chose a Different Direction"></a>Layer 8: Ethereum Chose a Different Direction</h2><p>Ethereum’s choice is closer to:</p>
+<blockquote>
+<p>Give developers a sufficiently general-purpose, dynamic virtual computer.</p>
+</blockquote>
+<p>A contract has its own storage.</p>
+<p>A contract can dynamically call other contracts.</p>
+<p>A program can decide during execution what it will access next.</p>
+<p>Developers work with:</p>
+<pre><code class="text">Code
++
+Storage
+</code></pre>
+<p>Without first having to consider:</p>
+<pre><code class="text">How many Accounts should I split this into?
+Which Accounts must this transaction pass in?
+Which Account will require a Write Lock?
+</code></pre>
+<p>This makes the EVM programming model feel natural.</p>
+<p>Its dynamic composability is particularly strong.</p>
+<p>For example:</p>
+<pre><code class="solidity">address target = calculateTarget();
+
+ITarget(target).foo();
+</code></pre>
+<p>As long as the program’s logic permits it, the target can be chosen only when execution reaches this point.</p>
+<p>The cost is:</p>
+<p><strong>The runtime knows almost nothing about the meaning of application state.</strong></p>
+<p>It does not know:</p>
+<pre><code class="text">What a Token is
+What a Pool is
+What a Position is
+What an Order is
+What a Vault is
+</code></pre>
+<p>It does not even know:</p>
+<pre><code class="text">Which business object a particular mapping represents
+</code></pre>
+<p>Off-chain infrastructure must therefore reconstruct the meaning of many things.</p>
+<p>For example:</p>
+<pre><code class="text">Token Holder Indexer
+DEX Indexer
+NFT Indexer
+Position Indexer
+The Graph
+Etherscan
+Alchemy
+</code></pre>
+<p>From this perspective, Ethereum’s dependence on indexers is not merely a consequence of the amount of data.</p>
+<p>The deeper reason is:</p>
+<blockquote>
+<p><strong>Many business objects exist only in a contract’s internal semantics, rather than explicitly existing as system-level objects.</strong></p>
+</blockquote>
+<hr>
+<h2 id="Layer-9-Two-Very-Different-Philosophies-of-State"><a href="#Layer-9-Two-Very-Different-Philosophies-of-State" class="headerlink" title="Layer 9: Two Very Different Philosophies of State"></a>Layer 9: Two Very Different Philosophies of State</h2><p>At this point, “Why can Solana query holders while Ethereum cannot query them directly?” is no longer a question about token standards alone.</p>
+<p>It has become a question about the two chains’ different answers to:</p>
+<blockquote>
+<p>What should the relationship between programs and state be?</p>
+</blockquote>
+<p>Ethereum is closer to:</p>
+<pre><code class="text">Contract-centric
+
+Contract
+├── Code
+└── Storage
+</code></pre>
+<p>The program owns its state.</p>
+<p>Developers organize storage freely.</p>
+<p>The runtime understands as little business meaning as possible.</p>
+<p>Solana is closer to:</p>
+<pre><code class="text">Account-centric
+
+Program
+├── Account
+├── Account
+├── Account
+└── Account
+</code></pre>
+<p>The program interprets state.</p>
+<p>State is split into many independent accounts that can be addressed, owned, and locked.</p>
+<p>The two chains therefore exhibit very different characteristics:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Ethereum &#x2F; EVM</th>
+<th>Solana</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Core abstraction</td>
+<td>Contract</td>
+<td>Account + Program</td>
+</tr>
+<tr>
+<td>Where state lives</td>
+<td>Contract Storage</td>
+<td>Independent Data Accounts</td>
+</tr>
+<tr>
+<td>Token balance</td>
+<td>State inside a contract</td>
+<td>Token Account</td>
+</tr>
+<tr>
+<td>State access</td>
+<td>More dynamic</td>
+<td>Accounts declared in advance</td>
+</tr>
+<tr>
+<td>Holder enumeration</td>
+<td>Usually depends on an indexer</td>
+<td>Token accounts can be scanned</td>
+</tr>
+<tr>
+<td>Runtime understanding of business objects</td>
+<td>Very limited</td>
+<td>At least understands account boundaries</td>
+</tr>
+<tr>
+<td>Parallel scheduling</td>
+<td>More difficult under the native model</td>
+<td>Naturally supported by the account model</td>
+</tr>
+<tr>
+<td>Dynamic composability</td>
+<td>Very strong</td>
+<td>More constrained by account lists</td>
+</tr>
+<tr>
+<td>State-management complexity</td>
+<td>More is hidden by the VM</td>
+<td>More is exposed to developers</td>
+</tr>
+<tr>
+<td>Performance trade-off</td>
+<td>Flexibility first</td>
+<td>Schedulability and throughput first</td>
+</tr>
+</tbody></table>
+<p>This is not simply a question of:</p>
+<pre><code class="text">Which one is advanced
+Which one is behind
+</code></pre>
+<p>They represent different engineering trade-offs.</p>
+<hr>
+<h2 id="Layer-10-Solana-Gives-Complexity-to-Developers-Ethereum-Gives-It-to-the-System-and-Infrastructure"><a href="#Layer-10-Solana-Gives-Complexity-to-Developers-Ethereum-Gives-It-to-the-System-and-Infrastructure" class="headerlink" title="Layer 10: Solana Gives Complexity to Developers; Ethereum Gives It to the System and Infrastructure"></a>Layer 10: Solana Gives Complexity to Developers; Ethereum Gives It to the System and Infrastructure</h2><p>Summarizing further leads to an interesting conclusion.</p>
+<p>Many of Solana’s awkward features have a reason behind them.</p>
+<p>Why must a program receive so many accounts?</p>
+<p>Why do developers have to handle PDAs?</p>
+<p>Why do complex transactions have long account lists?</p>
+<p>Why do hot accounts matter?</p>
+<p>Why must applications consider state sharding during design?</p>
+<p>Because Solana wants the runtime to understand:</p>
+<pre><code class="text">Which state is being accessed
+Which state will conflict
+Which transactions can run in parallel
+</code></pre>
+<p>Developers must therefore express those relationships explicitly.</p>
+<p>In other words:</p>
+<blockquote>
+<p>Solana gives more complexity to application developers in exchange for determinism and performance at the runtime level.</p>
+</blockquote>
+<p>Ethereum takes another path.</p>
+<p>Developers can simply write:</p>
+<pre><code class="solidity">mapping(address =&gt; Position) positions;
+</code></pre>
+<p>And leave many state-organization issues inside contract storage.</p>
+<p>The development experience is more natural.</p>
+<p>The model is more dynamic.</p>
+<p>But the cost is that the runtime struggles to understand:</p>
+<pre><code class="text">Who is accessing which application state
+What each data structure represents
+Which transactions truly do not conflict
+</code></pre>
+<p>The complexity does not disappear.</p>
+<p>It is transferred elsewhere:</p>
+<pre><code class="text">Indexer
+Client
+Rollup
+Execution Engine
+State Database
+Off-chain Infrastructure
+</code></pre>
+<p>The distinction is not:</p>
+<pre><code class="text">One is complex
+One is simple
+</code></pre>
+<p>It is closer to:</p>
+<blockquote>
+<p><strong>The complexity is placed in different locations.</strong></p>
+</blockquote>
+<p>Solana tends toward:</p>
+<pre><code class="text">Complexity → Developers + Explicit state model
+</code></pre>
+<p>Ethereum tends toward:</p>
+<pre><code class="text">Complexity → VM + Client + Indexer + Infrastructure
+</code></pre>
+<hr>
+<h1 id="Finally-Back-to-Holders"><a href="#Finally-Back-to-Holders" class="headerlink" title="Finally, Back to Holders"></a>Finally, Back to Holders</h1><p>We can now answer the question at the beginning of this article again:</p>
+<blockquote>
+<p>Why can Solana query a token’s holders while Ethereum cannot query them directly?</p>
+</blockquote>
+<p>At the most superficial level:</p>
+<blockquote>
+<p>SPL Token uses standardized token accounts, whereas ERC-20 does not provide holder enumeration.</p>
+</blockquote>
+<p>One level deeper:</p>
+<blockquote>
+<p>ERC-20 balances usually live inside contract storage, while SPL token balances are explicitly represented by separate accounts.</p>
+</blockquote>
+<p>Deeper still:</p>
+<blockquote>
+<p>Solana makes accounts first-class citizens in its state model, while Ethereum’s main abstraction for state is contract storage.</p>
+</blockquote>
+<p>And deeper again:</p>
+<blockquote>
+<p>Solana wants transactions to explicitly declare state dependencies before execution so the runtime can detect conflicts and schedule parallel execution.</p>
+</blockquote>
+<p>Keep going:</p>
+<blockquote>
+<p>Solana is willing to give up some freedom in dynamic state access and increase the burden on developers in exchange for stronger runtime schedulability and parallelism.</p>
+</blockquote>
+<p>Ethereum prefers to provide:</p>
+<blockquote>
+<p>A dynamic, general-purpose smart contract environment that is easy to compose.</p>
+</blockquote>
+<p>Ethereum contracts can therefore organize their internal state more freely, but the runtime has difficulty understanding these business objects at the system level.</p>
+<p>Ultimately, the question reveals:</p>
+<pre><code class="text">Ethereum:
+Programs freely own and access state.
+
+Solana:
+State is explicitly split into Accounts,
+and programs operate around those Accounts.
+</code></pre>
+<p>So:</p>
+<pre><code class="text">Solana can query Token Holders
+</code></pre>
+<p>is not an isolated RPC feature.</p>
+<p>It is a small entry point.</p>
+<p>Follow it deeper, and we eventually see:</p>
+<blockquote>
+<p><strong>Solana and Ethereum made two different choices about how a blockchain should organize state, execute programs, and use parallel computation.</strong></p>
+</blockquote>
+<p>The holder list is simply one of the most readily observable consequences of that architectural difference.</p>
+</div></div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.2"></script><script defer src="/js/highlight.min.js?v=v1.2"></script><script defer src="/js/main.js?v=v1.2"></script><script defer src="/js/lightbox.js?v=v1.2"></script><script defer src="/js/bootstrap.min.js?v=v1.2"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>
