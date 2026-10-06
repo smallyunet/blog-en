@@ -1,0 +1,674 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>Just How Messy Is Ethereum’s Technical Architecture?</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2026/09/23/how-messy-is-ethereums-architecture/"><meta property="og:title" content="Just How Messy Is Ethereum’s Technical Architecture?"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2026/09/23/how-messy-is-ethereums-architecture/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.2"><link rel="stylesheet" href="/css/post.css?v=v1.2"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.2"><link rel="stylesheet" href="/css/ai-content.css?v=5"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>Just How Messy Is Ethereum’s Technical Architecture?</h1><div class="time">2026-09-23</div><div class="title-margin"></div><div class="ai-content"><p>If a group of engineers were asked to design a blockchain from scratch today, there is a high probability that they would not design Ethereum today.</p>
+<p>It’s not because Ethereum can’t do things.</p>
+<p>On the contrary, the biggest problem with Ethereum is:<strong>It can do everything, but a lot of things are added later.</strong></p>
+<p>More than ten years of operating history, security incidents, Gas model modifications, account abstraction, consensus switching, Layer 2 expansion, and countless special logic left over in order to continue to be compatible with the past are all ultimately deposited in the same set of protocols.</p>
+<p>The complexity of Ethereum today is not entirely the complexity brought about by “rich functions”.</p>
+<p>A considerable part of them are <strong>Complications posed by historical debt.</strong></p>
+<p>If you look at Ethereum as a large-scale software that has been running for more than ten years, it becomes more and more like a legacy system that no one dares to truly reconstruct and can only continue to patch.</p>
+<p>The most ridiculous thing is that these patches don’t disappear.</p>
+<p>A lot of what happened ten years ago still exists in the source code of the Ethereum client today.</p>
+<p>This is what I said:</p>
+<p><strong>Ethereum’s technology is dirty.</strong></p>
+<p>“Dirty” here does not mean that the code level is poor, but that it has accumulated a large number of special rules, exceptions, compatibility layers and protocol patches that can only be explained in conjunction with historical background.</p>
+<p>And this kind of dirtiness can be traced all the way back to 2016 to today.</p>
+<hr>
+<h2 id="1-The-DAO-A-hacker-attack-was-permanently-written-into-the-client-source-code"><a href="#1-The-DAO-A-hacker-attack-was-permanently-written-into-the-client-source-code" class="headerlink" title="1. The DAO: A hacker attack was permanently written into the client source code"></a>1. The DAO: A hacker attack was permanently written into the client source code</h2><p>The most classic “historical fossil” of Ethereum is The DAO in 2016.</p>
+<p>After The DAO was attacked, the Ethereum community finally chose to modify the status through Hard Fork and transfer the ETH in a batch of DAO-related accounts to the refund contract.</p>
+<p>There has been debate for ten years about whether this matter violates “Code is Law”.</p>
+<p>But if we don’t discuss philosophy for the moment and just look at the engineering implementation, this matter is actually more interesting.</p>
+<p>Because when you open the source code of go-ethereum today, you can still find:</p>
+<pre><code class="go">var DAORefundContract = common.HexToAddress(
+    &quot;0xbf4ed7b27f1d666546e30d74d50d173d20bca754&quot;,
+)
+
+func DAODrainList() []common.Address &#123;
+    return []common.Address&#123;
+        common.HexToAddress(&quot;0xd4fe7bc31cedb7bfb8a345f31e668033056b2728&quot;),
+        common.HexToAddress(&quot;0xb3fb0e5aba0e20e5c49d252dfd30e102b171a425&quot;),
+        common.HexToAddress(&quot;0x2c19c7f9ae8b751e37aeb2d93a699722395ae18f&quot;),
+        ...
+    &#125;
+&#125;
+</code></pre>
+<p>Not pseudocode.</p>
+<p>Not a historical document.</p>
+<p>Rather <strong>Code that still exists in the go-ethereum master branch in 2026.</strong></p>
+<p>The file is at:</p>
+<p><code>params/dao.go</code></p>
+<p>In the current source code,<code>DAORefundContract</code> around lines 561–563, while <code>DAODrainList()</code> Immediately after starting at line 564. It directly hardcodes a long list of addresses participating in DAO state migration.</p>
+<p>Even the comments are very straightforward:</p>
+<blockquote>
+<p>DAODrainList is the list of accounts whose full balances will be moved into a refund contract</p>
+</blockquote>
+<p>This sentence is very shocking from an engineering perspective.</p>
+<p>A blockchain that claims to be universal, decentralized, and whose state transfer is defined by the protocol is permanently stored in the client source code:</p>
+<p><strong>“When a specific historical event occurred in 2016, the money from these specific accounts was transferred to this specific address.”</strong></p>
+<p>This is not an abstract protocol rule.</p>
+<p>This is a historical event.</p>
+<p>is an if.</p>
+<p>It’s just that this if is written into the consensus.</p>
+<p>More precisely:</p>
+<p><strong>There is a tombstone in Ethereum’s consensus rules commemorating the 2016 DAO hack.</strong></p>
+<p>All clients that wish to fully execute the historical state of Ethereum starting from the genesis block must understand it.</p>
+<p>This is technical debt in its purest form:</p>
+<blockquote>
+<p>An event that has been over for ten years can never be truly deleted from the code because it cannot destroy the historical consensus.</p>
+</blockquote>
+<hr>
+<h1 id="2-A-client-carrying-all-Ethereum-for-more-than-ten-years"><a href="#2-A-client-carrying-all-Ethereum-for-more-than-ten-years" class="headerlink" title="2. A client, carrying all Ethereum for more than ten years."></a>2. A client, carrying all Ethereum for more than ten years.</h1><p>Next open go-ethereum <code>params/config.go</code>.</p>
+<p>You will see something very spectacular:</p>
+<pre><code class="text">HomesteadBlock
+DAOForkBlock
+EIP150Block
+EIP155Block
+EIP158Block
+ByzantiumBlock
+ConstantinopleBlock
+PetersburgBlock
+IstanbulBlock
+MuirGlacierBlock
+BerlinBlock
+LondonBlock
+ArrowGlacierBlock
+GrayGlacierBlock
+MergeNetsplitBlock
+
+ShanghaiTime
+CancunTime
+PragueTime
+OsakaTime
+...
+</code></pre>
+<p>This is not an Ethereum history lesson.</p>
+<p>This is the running configuration of the Ethereum client.</p>
+<p>There is even such a judgment directly in the source code:</p>
+<pre><code class="go">func (c *ChainConfig) IsHomestead(num *big.Int) bool
+func (c *ChainConfig) IsDAOFork(num *big.Int) bool
+func (c *ChainConfig) IsEIP150(num *big.Int) bool
+func (c *ChainConfig) IsEIP155(num *big.Int) bool
+func (c *ChainConfig) IsByzantium(num *big.Int) bool
+func (c *ChainConfig) IsConstantinople(num *big.Int) bool
+...
+</code></pre>
+<p>A technical detail needs to be clarified here.</p>
+<p>You cannot simply say “Ethereum runs all historical versions simultaneously”.</p>
+<p>It does not execute the three sets of rules of Byzantium, London and Cancun simultaneously in the current block.</p>
+<p>The real problem is more subtle:</p>
+<p><strong>Ethereum clients must know which historical period they are dealing with and choose the correct state transition rules for that period.</strong></p>
+<p>If a node syncs from the genesis block:</p>
+<p>The millionth block is to be executed as per the EVM of that era.</p>
+<p>The 5 millionth block is to be executed according to another era.</p>
+<p>The rules of BASEFEE have changed again since London.</p>
+<p>The consensus structure before and after Merge is completely different.</p>
+<p>Shanghai will have new rules in the future.</p>
+<p>Cancun blob again.</p>
+<p>That is to say:</p>
+<p><strong>Ethereum is not a set of protocols.</strong></p>
+<p>From a client engineering perspective, it is actually a long list of protocols spliced together according to block height and timestamp:</p>
+<pre><code class="text">Ethereum =
+Frontier
++ Homestead
++ DAO
++ Tangerine Whistle
++ Spurious Dragon
++ Byzantium
++ Constantinople
++ Petersburg
++ Istanbul
++ Berlin
++ London
++ Merge
++ Shanghai
++ Cancun
++ Prague
++ ...
+</code></pre>
+<p>And these things are not README.</p>
+<p>They are consensus.</p>
+<p>If you delete the wrong historical branch, the node may calculate a different state root.</p>
+<p>So Ethereum has a natural problem:</p>
+<p><strong>The longer the history, the less likely the agreement is to be truly clean.</strong></p>
+<p>New rules can be added.</p>
+<p>Old rules cannot be deleted casually.</p>
+<p>So the client is deposited layer by layer like geological layers.</p>
+<p>2015 is one layer.</p>
+<p>2016 is another layer.</p>
+<p>One more layer in 2021.</p>
+<p>In 2022, PoW will directly replace PoS and build another layer.</p>
+<p>The 2024 Blob gets another layer of coverage.</p>
+<p>The 2025 EOA delegation adds another layer.</p>
+<p>All this history ends up being called:</p>
+<p><strong>Ethereum.</strong></p>
+<hr>
+<h1 id="3-One-of-the-most-embarrassing-design-debts-EOA-is-too-stupid"><a href="#3-One-of-the-most-embarrassing-design-debts-EOA-is-too-stupid" class="headerlink" title="3. One of the most embarrassing design debts: EOA is too stupid"></a>3. One of the most embarrassing design debts: EOA is too stupid</h1><p>Ethereum’s early account system was very simple:</p>
+<p>One type is called EOA.</p>
+<p>One type is called Contract Account.</p>
+<p>The permission model of EOA is basically:</p>
+<pre><code class="text">private key
+        ↓
+ECDSA signature
+        ↓
+transaction
+</code></pre>
+<p>Whoever has the private key owns the account.</p>
+<p>Simple and even a little primitive.</p>
+<p>The problem is that when blockchain really started to be used by ordinary people, people discovered that the capabilities that wallets really need include:</p>
+<ul>
+<li>Multiple signatures</li>
+<li>social recovery</li>
+<li>Session Key</li>
+<li>Permission control</li>
+<li>Bulk transaction</li>
+<li>Gas payment</li>
+<li>ERC-20 payment gas</li>
+<li>Key rotation</li>
+<li>Daily quota</li>
+<li>Passkey</li>
+<li>Different operations use different authorization strategies</li>
+</ul>
+<p>EOA natively has almost none of these capabilities.</p>
+<p>This is not because Ethereum cannot do it using the account model.</p>
+<p>Simply blaming the problem on “useless UTXO” is not rigorous.</p>
+<p>The real question is:</p>
+<p><strong>The EOA authorization model originally designed by Ethereum was too thin.</strong></p>
+<p>The address is highly bound to a secp256k1 private key, and the protocol natively only understands a very simple transaction authentication logic.</p>
+<p>So Ethereum spent the next ten years trying to find ways to make accounts less like EOA.</p>
+<p>This is where Account Abstraction comes in.</p>
+<hr>
+<h1 id="4-ERC-4337-In-order-not-to-change-the-protocol-a-“pseudo-transaction-system”-was-built-on-top-of-the-protocol"><a href="#4-ERC-4337-In-order-not-to-change-the-protocol-a-“pseudo-transaction-system”-was-built-on-top-of-the-protocol" class="headerlink" title="4. ERC-4337: In order not to change the protocol, a “pseudo transaction system” was built on top of the protocol."></a>4. ERC-4337: In order not to change the protocol, a “pseudo transaction system” was built on top of the protocol.</h1><p>4337 is a very beautiful, but also very dirty example of Ethereum technical debt.</p>
+<p>The problems it solves are certainly real.</p>
+<p>But look how it works out.</p>
+<p>Normal Ethereum transactions:</p>
+<pre><code class="text">Wallet
+  ↓
+Transaction
+  ↓
+Ethereum mempool
+  ↓
+Block
+</code></pre>
+<p>4337: </p>
+<pre><code class="text">Smart Account
+     ↓
+UserOperation
+     ↓
+UserOp Mempool
+     ↓
+Bundler
+     ↓
+EntryPoint
+     ↓
+handleOps()
+     ↓
+Ethereum Transaction
+     ↓
+Block
+</code></pre>
+<p>Ethereum’s official EIP is even very candid in its description of it:</p>
+<p>4337 <strong>Deliberately avoid modifying the consensus layer</strong>.</p>
+<p>So it doesn’t really create Ethereum native transactions.</p>
+<p>Instead, it creates a:</p>
+<p><strong>pseudo-transaction object.</strong></p>
+<p>The name is:</p>
+<p><code>UserOperation</code></p>
+<p>What the user sent was not even an Ethereum transaction.</p>
+<p>But a UserOperation.</p>
+<p>Then a new role is needed:</p>
+<p><strong>Bundler</strong></p>
+<p>Bundler then packages several UserOperations, and finally constructs a real Ethereum transaction and calls a special:</p>
+<p><code>EntryPoint.handleOps()</code></p>
+<p>Finally getting into Ethereum.</p>
+<p>So in order for the account to have the permission model that a modern wallet should have, we get:</p>
+<pre><code class="text">EOA Transaction
+
++
+
+Smart Account
+
++
+
+UserOperation
+
++
+
+UserOp Mempool
+
++
+
+Bundler
+
++
+
+EntryPoint
+
++
+
+Paymaster
+</code></pre>
+<p>Paymaster is in turn responsible for Gas sponsorship.</p>
+<p>Bundler in turn needs its own simulation and verification logic.</p>
+<p>UserOperation has its own nonce.</p>
+<p>own gas limit.</p>
+<p>own validation.</p>
+<p>own mempool.</p>
+<p>Even its own DoS defense rules.</p>
+<p>From a functional perspective, this is very clever engineering.</p>
+<p>But from a system design perspective, it is also an extremely typical patch:</p>
+<blockquote>
+<p>The underlying trading model was difficult to change, so a trading system was built on top of the underlying trading system.</p>
+</blockquote>
+<p>Then tuck the second set of transactions into the first set of transactions.</p>
+<p>This is the most typical technical philosophy of Ethereum:</p>
+<p><strong>Try not to overturn the past and build on it.</strong></p>
+<hr>
+<h1 id="5-Then-Ethereum-discovered-4337-is-not-a-native-account-abstraction-after-all"><a href="#5-Then-Ethereum-discovered-4337-is-not-a-native-account-abstraction-after-all" class="headerlink" title="5. Then Ethereum discovered: 4337 is not a native account abstraction after all"></a>5. Then Ethereum discovered: 4337 is not a native account abstraction after all</h1><p>Here comes the problem.</p>
+<p>Since 4337 is so good, why did EIP-7702 appear later?</p>
+<p>Because the biggest problem of 4337 was written in the design goal from the beginning:</p>
+<p><strong>It does not modify the Ethereum consensus layer.</strong></p>
+<p>This is both its advantage and its original sin.</p>
+<p>A large amount of existing ETH and assets are still held in ordinary EOA.</p>
+<p>You can’t have users all over the world suddenly:</p>
+<p>“Please redeploy a Smart Account and move the assets there.”</p>
+<p>Ethereum will eventually have to continue patching EOA.</p>
+<p>Hence EIP-7702.</p>
+<hr>
+<h1 id="6-EIP-7702-An-EOA-can-now-“point-to-code”"><a href="#6-EIP-7702-An-EOA-can-now-“point-to-code”" class="headerlink" title="6. EIP-7702: An EOA can now “point to code”"></a>6. EIP-7702: An EOA can now “point to code”</h1><p>The design of the 7702 is quite magical.</p>
+<p>It allows an EOA to write a special delegation indicator:</p>
+<pre><code class="text">0xef0100 || address
+</code></pre>
+<p>Then when this EOA is executed, it can delegate its code behavior to the code at another address.</p>
+<p>That is to say:</p>
+<p>Previously:</p>
+<pre><code class="text">EOA = no code
+Contract = has code
+</code></pre>
+<p>This is the most basic account classification in Ethereum.</p>
+<p>Now:</p>
+<pre><code class="text">EOA = no code
+
+But
+
+EOA.code = 0xef0100 || contract_address
+
+Then execute the code of contract_address
+</code></pre>
+<p>EIP-7702 even needs to specifically specify what operations such as CALL, CALLCODE, DELEGATECALL, STATICCALL, and EXTCODESIZE, CODESIZE should see when they encounter this delegation indicator.</p>
+<p>So a once very simple question:</p>
+<blockquote>
+<p>“Is there a code for this address?”</p>
+</blockquote>
+<p>It’s not that simple anymore.</p>
+<p>That’s the price of compatibility.</p>
+<p>Ethereum cannot say:</p>
+<p><strong>EOA is designed wrong, we scrap EOA.</strong></p>
+<p>Because there are hundreds of millions of addresses out there.</p>
+<p>Hundreds of billions of dollars in assets are there.</p>
+<p>Hundreds of thousands of pieces of software assume EOA is EOA.</p>
+<p>So all I can say is:</p>
+<blockquote>
+<p>EOA is still EOA, but we allow some special code to be put in EOA; this code is not a real code, but a delegation marker; after EVM sees this marker, it will go to another account to find the real code.</p>
+</blockquote>
+<p>This is typical legacy system engineering.</p>
+<p>You can’t tear down walls.</p>
+<p>So another pipe was buried inside the wall.</p>
+<hr>
+<h1 id="7-It’s-not-over-yet-now-comes-EIP-8141-again"><a href="#7-It’s-not-over-yet-now-comes-EIP-8141-again" class="headerlink" title="7. It’s not over yet: now comes EIP-8141 again"></a>7. It’s not over yet: now comes EIP-8141 again</h1><p>If what you just said “4E81 &#x2F; 4E91” refers to what Ethereum is discussing recently <strong>Native Gas sponsorship &#x2F; Native Account Abstraction</strong>, what you want to say is probably:</p>
+<p><strong>EIP-8141: Frame Transaction.</strong></p>
+<p>It goes one step further than 4337.</p>
+<p>8141 Propose a new transaction type directly:</p>
+<p><strong>Frame Transaction.</strong></p>
+<p>A transaction is split into multiple frames, where different frames can be responsible for:</p>
+<pre><code class="text">VALIDATION
+PAYMENT
+EXECUTION
+</code></pre>
+<p>In other words:</p>
+<p>The logic of previous Ethereum transactions was basically:</p>
+<pre><code class="text">signature → sender → sender pays gas → execute
+</code></pre>
+<p>4337 said:</p>
+<pre><code class="text">We put a UserOperation outside.
+</code></pre>
+<p>7702 said:</p>
+<pre><code class="text">EOA can delegate code.
+</code></pre>
+<p>8141 goes further:</p>
+<pre><code class="text">It is better to dismantle the transaction itself.
+Who verifies the transaction, who pays, and who executes can be defined separately.
+</code></pre>
+<p>EIP-8141 explicitly targets alternative fee payment schemes, key rotation, smart accounts, etc.</p>
+<p>Technical capabilities are certainly stronger.</p>
+<p>But look back at this evolutionary line:</p>
+<pre><code class="text">EOA
+ ↓
+Smart Contract Wallet
+ ↓
+ERC-4337
+ ↓
+UserOperation
+ ↓
+Bundler
+ ↓
+EntryPoint
+ ↓
+Paymaster
+ ↓
+EIP-7702
+ ↓
+EOA Delegation
+ ↓
+EIP-8141
+ ↓
+Frame Transaction
+</code></pre>
+<p>Ten years later, Ethereum is finally getting closer to a reasonable programmable account model.</p>
+<p>What’s the cost?</p>
+<p><strong>Everything above basically already exists.</strong></p>
+<p>So the new design is not replacing the old design.</p>
+<p>Instead:</p>
+<p>Continue to coexist.</p>
+<hr>
+<h1 id="8-Blob-For-Layer-2-Layer-1-even-grew-a-new-data-organ"><a href="#8-Blob-For-Layer-2-Layer-1-even-grew-a-new-data-organ" class="headerlink" title="8. Blob: For Layer 2, Layer 1 even grew a new data organ."></a>8. Blob: For Layer 2, Layer 1 even grew a new data organ.</h1><p>Another extremely typical engineering compromise in Ethereum is EIP-4844.</p>
+<p>Ethereum’s initial scaling story was not:</p>
+<blockquote>
+<p>L1 is not responsible for executing a large number of transactions, and will mainly provide Data Availability for Rollup in the future.</p>
+</blockquote>
+<p>Ethereum started out as an execution chain itself.</p>
+<p>Later, it was found that L1 expansion was too difficult, so the strategy gradually turned to Rollup-centric.</p>
+<p>Here comes the problem.</p>
+<p>Rollups require publishing large amounts of data to Ethereum.</p>
+<p>Previously put calldata.</p>
+<p>Expensive.</p>
+<p>What to do?</p>
+<p>The most intuitive approach is to optimize calldata.</p>
+<p>Ethereum’s final choice is:</p>
+<p><strong>Add a completely new data structure to the protocol.</strong></p>
+<p>Blob.</p>
+<p>So a very strange transaction appeared on Ethereum:</p>
+<p><strong>Blob-carrying transaction.</strong></p>
+<p>Blob data:</p>
+<ul>
+<li>Bind to the Ethereum block;</li>
+<li>Availability is guaranteed by the consensus layer;</li>
+<li>EVM cannot read directly like calldata;</li>
+<li>What EVM mainly sees is its commitment;</li>
+<li>The data is not required to be permanently stored in the execution layer state.</li>
+</ul>
+<p>EIP-4844 himself wrote it very clearly:</p>
+<p>Its direct goal is to provide cheap Data Availability for Rollup.</p>
+<p>So now Ethereum is not just one:</p>
+<p><strong>A blockchain that executes smart contracts.</strong></p>
+<p>It also serves as:</p>
+<p><strong>Rollup data publishing layer.</strong></p>
+<p>For this role, L1 specifically adds:</p>
+<pre><code class="text">Blob Transaction
+Blob Gas
+Blob Base Fee
+Blob Commitment
+KZG
+Point Evaluation
+Blob Sidecar
+</code></pre>
+<p>What is this?</p>
+<p>This is the organ left behind by the underlying protocol after the architectural route is changed.</p>
+<p>If Rollup-centric roadmap is Ethereum’s success, then Blob is brilliant design.</p>
+<p>But if you look at it from another perspective - especially from the perspective of “L1 itself should keep its structure simple” - you will get the exact opposite conclusion:</p>
+<p><strong>In order to save an increasingly complex L2 expansion system, Ethereum wrote the special requirements of L2 directly into L1.</strong></p>
+<p>Rollup was originally supposed to be an application on Ethereum.</p>
+<p>Eventually the Ethereum protocol in turn modified itself for Rollup.</p>
+<p>The tail starts wagging the dog.</p>
+<hr>
+<h1 id="9-The-more-successful-Layer-2-is-the-less-Ethereum’s-overall-system-will-look-like-“a-chain”"><a href="#9-The-more-successful-Layer-2-is-the-less-Ethereum’s-overall-system-will-look-like-“a-chain”" class="headerlink" title="9. The more successful Layer 2 is, the less Ethereum’s overall system will look like “a chain”"></a>9. The more successful Layer 2 is, the less Ethereum’s overall system will look like “a chain”</h1><p>This is also what I think is the most ridiculous thing about the Rollup route.</p>
+<p>One of the most powerful narratives Ethereum has ever had is called:</p>
+<p><strong>Composability.</strong></p>
+<p>All contracts are in the same state machine.</p>
+<p>Uniswap can adjust Aave.</p>
+<p>Aave can adjust Maker.</p>
+<p>Completed within one transaction.</p>
+<p>This is called true composability.</p>
+<p>What does Rollup-centric Ethereum do?</p>
+<p>Cut the entire Ethereum ecosystem into:</p>
+<pre><code class="text">Ethereum L1
+
+Arbitrum
+Optimism
+Base
+zkSync
+Scroll
+Linea
+Starknet
+...
+
+Then for each chain:
+own sequencer
+own bridge
+own status
+Your own withdrawal rules
+own fee
+own explorer
+own RPC
+own failure mode
+</code></pre>
+<p>The problems Ethereum originally solved were:</p>
+<blockquote>
+<p>Don’t leave it to everyone to maintain their own databases and trust systems.</p>
+</blockquote>
+<p>The Rollup era finally becomes:</p>
+<blockquote>
+<p>Each Rollup maintains its own state machine.</p>
+</blockquote>
+<p>Then everyone will study:</p>
+<ul>
+<li>shared sequencing</li>
+<li>intents</li>
+<li>chain abstraction</li>
+<li>interoperability</li>
+<li>based rollups</li>
+<li>canonical bridges</li>
+<li>liquidity aggregation</li>
+</ul>
+<p>First take apart a unified system.</p>
+<p>Spend another five years figuring out how to put it back together.</p>
+<p>It’s hard not to doubt:</p>
+<p><strong>Are you solving the capacity expansion problem or creating the next generation infrastructure problem?</strong></p>
+<p>What’s even more ironic is that in order to maintain this architecture, Ethereum L1 needs to be constantly modified.</p>
+<p>Blobs are the most obvious example.</p>
+<hr>
+<h1 id="10-Difficulty-Bomb-a-“temporary-mechanism”-that-has-been-postponed-again-and-again"><a href="#10-Difficulty-Bomb-a-“temporary-mechanism”-that-has-been-postponed-again-and-again" class="headerlink" title="10. Difficulty Bomb: a “temporary mechanism” that has been postponed again and again"></a>10. Difficulty Bomb: a “temporary mechanism” that has been postponed again and again</h1><p>There is also a very classic design in the history of Ethereum:</p>
+<p><strong>Difficulty Bomb.</strong></p>
+<p>In order to force the network to eventually switch from PoW to PoS, Ethereum designed the Difficulty Bomb in the protocol, which ultimately increased the mining difficulty exponentially.</p>
+<p>Beautiful in theory:</p>
+<blockquote>
+<p>At that time, PoW will become more and more difficult, forcing everyone to upgrade to PoS.</p>
+</blockquote>
+<p>What actually happened?</p>
+<p>PoS didn’t go as planned.</p>
+<p>So:</p>
+<p>postponed.</p>
+<p>Then it was postponed.</p>
+<p>Then continue to postpone.</p>
+<p>Difficulty Bomb delay has been included in multiple upgrades in Ethereum history.</p>
+<p>For example:</p>
+<pre><code class="text">Byzantium
+Constantinople
+Muir Glacier
+London
+Arrow Glacier
+Gray Glacier
+</code></pre>
+<p>Therefore, the protocol mechanism originally used to force the migration of technical routes on time eventually turned into a historical debt that required repeated maintenance.</p>
+<p>This is almost a microcosm of the engineering history of Ethereum:</p>
+<p><strong>Design a mechanism to solve future problems.</strong></p>
+<p>The future did not happen as expected.</p>
+<p>So I wrote another EIP and modified the previous mechanism.</p>
+<hr>
+<h1 id="11-The-Gas-rule-itself-is-also-an-archeology"><a href="#11-The-Gas-rule-itself-is-also-an-archeology" class="headerlink" title="11. The Gas rule itself is also an archeology"></a>11. The Gas rule itself is also an archeology</h1><p>The Ethereum EVM looks like a pinned virtual machine.</p>
+<p>Not really.</p>
+<p>The gas cost of many opcodes has changed historically.</p>
+<p>Why?</p>
+<p>Because someone found that the original gas pricing was unreasonable and could cause DoS.</p>
+<p>So the price was repriced.</p>
+<p>Typical example:</p>
+<p>EIP-150.</p>
+<p>EIP-1884.</p>
+<p>EIP-2929.</p>
+<p>Re-evaluate again and again:</p>
+<pre><code class="text">How much should SLOAD cost?
+
+How much should BALANCE cost?
+
+What about EXTCODESIZE?
+
+Should Cold Access and Warm Access be different?
+</code></pre>
+<p>Berlin later even introduced:</p>
+<pre><code class="text">cold access
+warm access
+access list
+</code></pre>
+<p>So how much Gas is required to execute an opcode depends not only on the opcode.</p>
+<p>Also depends on:</p>
+<p><strong>What has this transaction previously visited.</strong></p>
+<p>There are certainly good security reasons for this.</p>
+<p>But from the perspective of VM elegance:</p>
+<p>This can hardly be called beautiful.</p>
+<p>This is a scar left by a real system that constantly recalibrates its cost model after encountering attacks and performance bottlenecks.</p>
+<hr>
+<h1 id="12-SELFDESTRUCT-An-opcode-is-alive-and-the-semantics-have-been-changed"><a href="#12-SELFDESTRUCT-An-opcode-is-alive-and-the-semantics-have-been-changed" class="headerlink" title="12. SELFDESTRUCT: An opcode is alive and the semantics have been changed."></a>12. SELFDESTRUCT: An opcode is alive and the semantics have been changed.</h1><p>There’s something else that’s particularly illustrative of Ethereum’s problems:</p>
+<p><code>SELFDESTRUCT</code></p>
+<p>In early Ethereum, contracts could SELFDESTRUCT:</p>
+<p>Remove code.</p>
+<p>Clean storage.</p>
+<p>Send ETH.</p>
+<p>It was later discovered that this introduced a lot of complexity and hindered future state structures like Verkle Trees.</p>
+<p>What to do?</p>
+<p>Delete opcode?</p>
+<p>Cannot be deleted.</p>
+<p>Because historical contracts may rely on it.</p>
+<p>So EIP-6780 did a very Ethereum thing:</p>
+<p><strong>Keep the SELFDESTRUCT name and opcode, but change its semantics.</strong></p>
+<p>Now, unless SELFDESTRUCT occurs in the same transaction as the contract creation, it basically no longer actually “destroy” the account’s code and storage.</p>
+<p>So:</p>
+<pre><code class="text">SELFDESTRUCT
+</code></pre>
+<p>This opcode:</p>
+<p><strong>It is no longer necessary to self destruct.</strong></p>
+<p>If a language design goes as far as:</p>
+<blockquote>
+<p>The function name cannot be changed, nor can the function be deleted, but we can change the function behavior.</p>
+</blockquote>
+<p>That’s basically one of the most standard symptoms of legacy compatibility.</p>
+<hr>
+<h1 id="13-Ethereum-today-is-no-longer-a-set-of-elegant-designs-but-a-city"><a href="#13-Ethereum-today-is-no-longer-a-set-of-elegant-designs-but-a-city" class="headerlink" title="13. Ethereum today is no longer a set of elegant designs, but a city"></a>13. Ethereum today is no longer a set of elegant designs, but a city</h1><p>At this point someone may object:</p>
+<p>Isn’t Windows compatible with software from decades ago?</p>
+<p>Doesn’t the Linux Kernel also have historical baggage?</p>
+<p>Doesn’t TCP&#x2F;IP also have a lot of historical problems?</p>
+<p>That’s right.</p>
+<p>This just illustrates the problem.</p>
+<p>One of Ethereum’s greatest achievements today may also be its greatest technical flaw:</p>
+<p><strong>It can no longer be reinvented.</strong></p>
+<p>It is no longer an experimental blockchain project.</p>
+<p>It is already a city.</p>
+<p>A city will not bulldoze and rebuild its entire city just because the road planning is poor.</p>
+<p>Only:</p>
+<p>Build an overpass.</p>
+<p>Build the subway.</p>
+<p>Add traffic lights.</p>
+<p>Add overhead.</p>
+<p>Modify one-way streets.</p>
+<p>Dig another tunnel.</p>
+<p>Then if you look at the map a few decades later, you will find:</p>
+<p>Why is this road so strange?</p>
+<p>Because there was a building here 20 years ago.</p>
+<p>Why does the subway take a detour?</p>
+<p>Because the demolition was not discussed 15 years ago.</p>
+<p>Why is there suddenly a three-story interchange here?</p>
+<p>Because there were too many cars later.</p>
+<p>This is Ethereum.</p>
+<hr>
+<h1 id="14-The-real-problem-of-Ethereum-is-not-complexity-but-“historical-complexity-cannot-be-recovered”"><a href="#14-The-real-problem-of-Ethereum-is-not-complexity-but-“historical-complexity-cannot-be-recovered”" class="headerlink" title="14. The real problem of Ethereum is not complexity, but “historical complexity cannot be recovered”"></a>14. The real problem of Ethereum is not complexity, but “historical complexity cannot be recovered”</h1><p>Complexity itself is not a sin.</p>
+<p>Solana is also complex.</p>
+<p>Bitcoin is also historically compatible.</p>
+<p>Operating systems are more complex.</p>
+<p>The really uncomfortable thing about Ethereum is:</p>
+<p><strong>A lot of its complexity comes from historical choices, and that complexity is difficult to reclaim.</strong></p>
+<p>It’s been ten years since The DAO.</p>
+<p>The DAO fork code is still there.</p>
+<p>PoW is gone.</p>
+<p>Clients still have to understand the chain in the PoW era.</p>
+<p>EOA is no longer enough.</p>
+<p>Cannot be deleted.</p>
+<p>So add 4337.</p>
+<p>4337 is not native enough.</p>
+<p>So add 7702.</p>
+<p>7702 is still just a transition.</p>
+<p>So study 8141.</p>
+<p>L1 expansion is difficult.</p>
+<p>So L2 was developed.</p>
+<p>L2 needs data.</p>
+<p>So L1 adds Blob.</p>
+<p>Blob has its own Fee Market again.</p>
+<p>Continue with PeerDAS, Danksharding later.</p>
+<p>Look at each step individually:</p>
+<p><strong>There are reasons.</strong></p>
+<p>This is the most dangerous place.</p>
+<p>Bad systems usually don’t happen because someone made a stupid decision one day.</p>
+<p>Instead:</p>
+<p><strong>Every local decision seems perfectly reasonable.</strong></p>
+<p>Then ten years later, when all the “reasonable decisions” are stacked together, you get a system that no one can completely fit into their head.</p>
+<hr>
+<h1 id="15-This-is-the-“dirtiest”-thing-about-Ethereum"><a href="#15-This-is-the-“dirtiest”-thing-about-Ethereum" class="headerlink" title="15. This is the “dirtiest” thing about Ethereum"></a>15. This is the “dirtiest” thing about Ethereum</h1><p>So when I say:</p>
+<p><strong>Ethereum’s technical architecture is dirty.</strong></p>
+<p>What I don’t mean is:</p>
+<p>Ethereum developers are poor.</p>
+<p>Quite the opposite.</p>
+<p>Ethereum may have the strongest group of protocol engineers in the entire blockchain industry.</p>
+<p>Here’s the real irony:</p>
+<p><strong>The need for so many top engineers is largely due to the fact that the system has become so complex that it must be maintained by top engineers.</strong></p>
+<p>DAO Fork.</p>
+<p>A dozen generations of Hard Fork.</p>
+<p>Gas repricing.</p>
+<p>EIP-1559.</p>
+<p>PoW → PoS.</p>
+<p>Execution Layer + Consensus Layer.</p>
+<p>Smart Contract Wallet.</p>
+<p>ERC-4337.</p>
+<p>UserOperation.</p>
+<p>Bundler.</p>
+<p>EntryPoint.</p>
+<p>Paymaster.</p>
+<p>EIP-7702.</p>
+<p>EOA delegation.</p>
+<p>EIP-8141.</p>
+<p>Frame Transaction.</p>
+<p>Rollup.</p>
+<p>Blob.</p>
+<p>Blob Gas.</p>
+<p>KZG.</p>
+<p>Data Availability.</p>
+<p>Taken alone, all of this can write a beautiful technical paper.</p>
+<p>But put them all together, and what you see is no longer “elegance.”</p>
+<p>Instead:</p>
+<p><strong>The entire historical cost paid for a system that can never be shut down or reinvented.</strong></p>
+<p>The most worthy of study of Ethereum may no longer be:</p>
+<blockquote>
+<p>How to design a blockchain?</p>
+</blockquote>
+<p>Instead:</p>
+<blockquote>
+<p>What will a blockchain become after running for more than ten years and carrying hundreds of billions of dollars in assets?</p>
+</blockquote>
+<p>The answer given by Ethereum is:</p>
+<p>It will become a huge state machine in which almost nothing can be deleted, no history can be forgotten, and any mistakes can only be forward-compatible.</p>
+<p>Each generation of engineers feels like they’ve only added one feature that makes sense.</p>
+<p>In the end, the entire agreement turned into a technological archaeological site.</p>
+<p>You can even open a file called <code>dao.go</code> files,</p>
+<p>Then see:</p>
+<p>The address left behind by the hacker attack in 2016,</p>
+<p>Still lying there quietly.</p>
+<p><strong>This is how dirty Ethereum’s technical architecture really is.</strong></p>
+</div></div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.2"></script><script defer src="/js/highlight.min.js?v=v1.2"></script><script defer src="/js/main.js?v=v1.2"></script><script defer src="/js/lightbox.js?v=v1.2"></script><script defer src="/js/bootstrap.min.js?v=v1.2"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>

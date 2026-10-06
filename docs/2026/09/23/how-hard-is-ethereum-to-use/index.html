@@ -1,0 +1,945 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>How Hard Is Ethereum to Use?</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2026/09/23/how-hard-is-ethereum-to-use/"><meta property="og:title" content="How Hard Is Ethereum to Use?"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2026/09/23/how-hard-is-ethereum-to-use/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.2"><link rel="stylesheet" href="/css/post.css?v=v1.2"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.2"><link rel="stylesheet" href="/css/ai-content.css?v=5"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>How Hard Is Ethereum to Use?</h1><div class="time">2026-09-23</div><div class="title-margin"></div><div class="ai-content"><p>Many people say that Ethereum user experience is not good.</p>
+<p>This is too kind a statement.</p>
+<p>The really ridiculous thing about Ethereum is not that “there are a lot of steps”, but rather:</p>
+<p><strong>It requires a person who just wants to transfer money, buy coins, and use applications to understand something that only protocol engineers should understand.</strong></p>
+<p>Nonce.</p>
+<p>Gas Limit.</p>
+<p>Base Fee.</p>
+<p>Priority Fee.</p>
+<p>Allowance.</p>
+<p>Calldata.</p>
+<p>EOA.</p>
+<p>Contract Account.</p>
+<p>Signature.</p>
+<p>Typed Data.</p>
+<p>MEV.</p>
+<p>Slippage.</p>
+<p>RPC.</p>
+<p>Chain ID.</p>
+<p>Bridge.</p>
+<p>Finality.</p>
+<p>UserOperation.</p>
+<p>Bundler.</p>
+<p>Paymaster.</p>
+<p>You can’t even simply say:</p>
+<blockquote>
+<p>I have ETH.</p>
+</blockquote>
+<p>Because someone may ask next:</p>
+<blockquote>
+<p>Native ETH or WETH?</p>
+</blockquote>
+<p>This has not been a steep learning curve.</p>
+<p>This is a set of infrastructure that spits all its internal implementation details in the user’s face, and then tells the user:</p>
+<p><strong>Please study on your own.</strong></p>
+<p>What’s even more outrageous is that after using Crypto for a few years, Crypto users started to think that all this was normal.</p>
+<p>So in this article I don’t want to discuss the already bad issue of “Ethereum Gas is expensive”.</p>
+<p>We discuss some of the more ridiculous stuff.</p>
+<hr>
+<h1 id="1-One-of-the-most-absurd-facts-about-Ethereum-ETH-is-not-even-a-normal-Ethereum-Token"><a href="#1-One-of-the-most-absurd-facts-about-Ethereum-ETH-is-not-even-a-normal-Ethereum-Token" class="headerlink" title="1. One of the most absurd facts about Ethereum: ETH is not even a normal Ethereum Token"></a>1. One of the most absurd facts about Ethereum: ETH is not even a normal Ethereum Token</h1><p>Ethereum has one of the most important token standards:</p>
+<p>ERC-20.</p>
+<p>USDC is ERC-20.</p>
+<p>USDT is ERC-20.</p>
+<p>DAI is an ERC-20.</p>
+<p>UNI is an ERC-20.</p>
+<p>Almost the entire Ethereum DeFi world works around ERC-20.</p>
+<p>Then:</p>
+<p><strong>Is ETH ERC-20?</strong></p>
+<p>No.</p>
+<p>Ethereum’s own native currency actually does not conform to Ethereum’s later most important Token Interface.</p>
+<p>The reason is also very simple:</p>
+<p><strong>ETH was born too early.</strong></p>
+<p>The official documentation itself admits that ETH predates ERC-20 and therefore does not comply with the ERC-20 standard; in order for ETH to be processed by DeFi applications like ordinary ERC-20, people later created WETH.</p>
+<p>As a result, Ethereum emerged with a very characteristic picture of the times:</p>
+<pre><code class="text">Ethereum native currency: ETH
+
+Ethereum Token Standard: ERC-20
+
+Question:
+ETH does not comply with the Ethereum Token standard
+
+Solution:
+Write a contract and deposit ETH into it,
+Mint another ERC-20 Token representing ETH.
+
+Name:
+Wrapped ETH
+</code></pre>
+<p>That is to say:</p>
+<p><strong>In order for Ethereum to allow its native currency to enter its own Token ecosystem normally, it needs to first package its native currency into a “fake self”.</strong></p>
+<p>This thing has been going on for so long that no one even thinks it’s funny.</p>
+<p>You have 10 ETH.</p>
+<p>Get into some DeFi protocols:</p>
+<blockquote>
+<p>Please Wrap first.</p>
+</blockquote>
+<p>So:</p>
+<pre><code class="text">ETH
+ ↓
+WETH
+</code></pre>
+<p>Run out:</p>
+<pre><code class="text">WETH
+ ↓
+ETH
+</code></pre>
+<p>The most exciting thing is:</p>
+<p>You can own WETH worth tens of thousands of dollars,</p>
+<p>But if Native ETH happens to be 0,</p>
+<p>You still may not be able to send transactions that require gas.</p>
+<p>Ethereum officials even specifically reminded:</p>
+<blockquote>
+<p>When wrapping ETH, remember to leave some Native ETH to pay for gas.</p>
+</blockquote>
+<p>In other words:</p>
+<p><strong>You have ETH.</strong></p>
+<p>But not the ETH that can pay for gas.</p>
+<p>If someone who comes into contact with Crypto for the first time feels confused about this kind of thing, it’s not because he doesn’t understand blockchain.</p>
+<p>But because it is inherently inexplicable.</p>
+<hr>
+<h1 id="2-Ethereum-has-a-very-magical-way-to-“cancel-a-transaction”-send-another-transaction"><a href="#2-Ethereum-has-a-very-magical-way-to-“cancel-a-transaction”-send-another-transaction" class="headerlink" title="2. Ethereum has a very magical way to “cancel a transaction”: send another transaction"></a>2. Ethereum has a very magical way to “cancel a transaction”: send another transaction</h1><p>What follows is what I consider to be one of the most comedic pieces of design in the history of Ethereum user experience.</p>
+<p>Let’s say you send a transaction.</p>
+<p>Gas is low.</p>
+<p>It’s stuck in mempool.</p>
+<p>You regret it.</p>
+<p>You click:</p>
+<blockquote>
+<p>Cancel Transaction</p>
+</blockquote>
+<p>What does a normal person understand by “cancellation”?</p>
+<p>Withdraw the transaction just now.</p>
+<p>What is the cancellation of Ethereum?</p>
+<p><strong>Send a new transaction.</strong></p>
+<p>And also:</p>
+<ul>
+<li>Use exactly the same nonce as the original transaction;</li>
+<li>Give higher handling fees;</li>
+<li>Usually send yourself 0 ETH;</li>
+<li>Let new transactions be packaged before old transactions;</li>
+<li>Rely on the rule that “the same nonce can only be executed once” to squeeze out old transactions.</li>
+</ul>
+<p>This is not a joke.</p>
+<p>MetaMask’s official manual cancellation method for advanced users is:</p>
+<p><strong>Send yourself a 0 ETH transaction, use the same nonce as the old transaction, and increase the gas.</strong></p>
+<p>So in Ethereum:</p>
+<pre><code class="text">Cancel
+</code></pre>
+<p>The real semantics are actually:</p>
+<pre><code class="text">with another, more expensive deal,
+Compete with the original transaction for the same serial number,
+Try to consume this serial number first.
+</code></pre>
+<p>Even “cancellation” is not a real operation in the agreement.</p>
+<p>It’s a race.</p>
+<p>Your old transaction:</p>
+<blockquote>
+<p>I want to execute.</p>
+</blockquote>
+<p>Your cancellation transaction:</p>
+<blockquote>
+<p>No, don’t execute it, let me execute it first.</p>
+</blockquote>
+<p>Then the user has to pay extra, so the verifier should be given priority:</p>
+<p><strong>“Please don’t execute the transaction I just made.”</strong></p>
+<p>This is no longer a bad UX.</p>
+<p>This is a person manipulating the database transaction log.</p>
+<hr>
+<h1 id="3-The-most-exciting-thing-is-if-one-transaction-is-stuck-it-can-block-all-your-subsequent-transactions"><a href="#3-The-most-exciting-thing-is-if-one-transaction-is-stuck-it-can-block-all-your-subsequent-transactions" class="headerlink" title="3. The most exciting thing is: if one transaction is stuck, it can block all your subsequent transactions."></a>3. The most exciting thing is: if one transaction is stuck, it can block all your subsequent transactions.</h1><p>Why did the trick just now work?</p>
+<p>Because the transaction nonce of Ethereum EOA is strictly increasing.</p>
+<p>For example, your account has been executed to:</p>
+<pre><code class="text">nonce = 100
+</code></pre>
+<p>Next:</p>
+<pre><code class="text">101
+102
+103
+104
+</code></pre>
+<p>Must be in order.</p>
+<p>The official documentation defines nonce as a counter that is sequentially incremented when an account sends a transaction. The same nonce cannot be executed twice.</p>
+<p>This means a particularly ridiculous user experience:</p>
+<p>You sent nonce 101.</p>
+<p>Gas is too low.</p>
+<p>101 stuck.</p>
+<p>Then you send:</p>
+<ol start="102">
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<p>Most likely all waiting there together.</p>
+<p>Because:</p>
+<p><strong>101 is not over yet.</strong></p>
+<p>MetaMask’s official troubleshooting document even requires users to start processing from the oldest pending nonce, and clearly states that nonce 10 cannot be canceled first and nonce 9 left.</p>
+<p>Imagine a banking system:</p>
+<p>You sent a transfer of 10 yuan this morning.</p>
+<p>It’s stuck.</p>
+<p>So PM all your other payments:</p>
+<p>coffee.</p>
+<p>Take a taxi.</p>
+<p>Lunch.</p>
+<p>Online shopping.</p>
+<p>All are prohibited.</p>
+<p>The bank tells you:</p>
+<blockquote>
+<p>Because Payment Order No. 71 has not yet been executed.</p>
+</blockquote>
+<blockquote>
+<p>Please deal with No. 71 first.</p>
+</blockquote>
+<p>You will think this bank is crazy.</p>
+<p>In Ethereum:</p>
+<p>This is called <strong>nonce management</strong>.</p>
+<p>There are even developers who specifically write:</p>
+<pre><code class="text">Nonce Manager
+</code></pre>
+<p>to manage this matter.</p>
+<p>A person who just wants to transfer money finally needs to understand the ordered sequence number in a distributed system.</p>
+<p>Then everyone said:</p>
+<blockquote>
+<p>Web3 requires user education.</p>
+</blockquote>
+<p>Educate a ghost.</p>
+<p><strong>This is because the internal details of the database come out and require manual maintenance by the user.</strong></p>
+<hr>
+<h1 id="4-Ethereum-even-implements-“accelerated-transactions”-into-“resending-transactions”"><a href="#4-Ethereum-even-implements-“accelerated-transactions”-into-“resending-transactions”" class="headerlink" title="4. Ethereum even implements “accelerated transactions” into “resending transactions”"></a>4. Ethereum even implements “accelerated transactions” into “resending transactions”</h1><p>Same thing with “Speed Up.”</p>
+<p>You see this in your wallet:</p>
+<blockquote>
+<p>Speed Up</p>
+</blockquote>
+<p>It looks like the original transaction was modified.</p>
+<p>What do you usually do?</p>
+<p><strong>Construct another replacement transaction with the same nonce but with a higher bid.</strong></p>
+<p>MetaMask clearly states that the acceleration operation will resubmit the transaction and reuse the nonce of the original transaction, increasing the Gas to make it more likely to be packaged first.</p>
+<p>Ethereum has even submitted EIP-2831 specifically to standardize this kind of transaction replacement notification, because the replacement mechanism will cause tracking problems for dapp developers.</p>
+<p>So the two buttons in the Ethereum wallet:</p>
+<pre><code class="text">Speed Up
+Cancel
+</code></pre>
+<p>The real implementations behind them are:</p>
+<pre><code class="text">With the same nonce, send another identical transaction that is more expensive.
+</code></pre>
+<p>and:</p>
+<pre><code class="text">Same as nonce, send another more expensive empty transaction
+</code></pre>
+<p>If a normal user had to know this, he would feel like the entire system was written in the 1990s.</p>
+<p>We just cover it up with beautiful UI.</p>
+<hr>
+<h1 id="5-Ethereum-has-also-invented-a-consumer-experience-if-you-don’t-buy-something-the-money-will-still-be-withheld"><a href="#5-Ethereum-has-also-invented-a-consumer-experience-if-you-don’t-buy-something-the-money-will-still-be-withheld" class="headerlink" title="5. Ethereum has also invented a consumer experience: if you don’t buy something, the money will still be withheld."></a>5. Ethereum has also invented a consumer experience: if you don’t buy something, the money will still be withheld.</h1><p>Suppose you go to a convenience store to buy something.</p>
+<p>Payment failed.</p>
+<p>Didn’t get anything.</p>
+<p>The cashier said:</p>
+<blockquote>
+<p>The transaction failed.</p>
+</blockquote>
+<p>You:</p>
+<blockquote>
+<p>OK.</p>
+</blockquote>
+<p>Cashier:</p>
+<blockquote>
+<p>But we still deducted 20 yuan from you.</p>
+</blockquote>
+<p>You:</p>
+<blockquote>
+<p>Why?</p>
+</blockquote>
+<p>Cashier:</p>
+<blockquote>
+<p>Because we just tried to process your payment, we incurred computational costs.</p>
+</blockquote>
+<p>This is Ethereum.</p>
+<p>Smart Contract is executed halfway:</p>
+<pre><code class="text">REVERT
+</code></pre>
+<p>Status changes are rolled back.</p>
+<p>Tokens are not exchanged.</p>
+<p>The NFT was not purchased.</p>
+<p>The loan was not lent out.</p>
+<p>But the gas consumed:</p>
+<p><strong>I won’t refund you.</strong></p>
+<p>The official Gas documentation clearly states: If Gas is exhausted during transaction execution, the status modification will be rolled back, but the Gas used to perform the work will still be consumed;<code>REVERT</code> Although all remaining Gas will not be burned like the early failure mechanism, the cost of calculations that have been executed still exists.</p>
+<p>Of course it makes sense in terms of engineering.</p>
+<p>The CPU has figured it out.</p>
+<p>The node has been executed.</p>
+<p>So collect money.</p>
+<p>The question is:</p>
+<p><strong>Why should users bear the cost of application execution path prediction failure?</strong></p>
+<p>The server in Web2 has a bug:</p>
+<p>The company pays the server fee.</p>
+<p>Ethereum: </p>
+<p>There is a bug in the smart contract, or the state changes causing the transaction to revert:</p>
+<p><strong>Users pay server fees.</strong></p>
+<p>This is a particularly great business model for Crypto:</p>
+<p>Program execution failed,</p>
+<p>The bill is sent to the person who called the program.</p>
+<hr>
+<h1 id="6-Ethereum’s-handling-fee-is-not-a-“handling-fee”-but-a-real-time-computing-resource-bidding"><a href="#6-Ethereum’s-handling-fee-is-not-a-“handling-fee”-but-a-real-time-computing-resource-bidding" class="headerlink" title="6. Ethereum’s handling fee is not a “handling fee”, but a real-time computing resource bidding"></a>6. Ethereum’s handling fee is not a “handling fee”, but a real-time computing resource bidding</h1><p>Let’s look at Gas again.</p>
+<p>Average users want to see:</p>
+<pre><code class="text">Handling fee: $2
+</code></pre>
+<p>What the bottom layer of Ethereum gives him is:</p>
+<pre><code class="text">gasLimit
+maxFeePerGas
+maxPriorityFeePerGas
+baseFeePerGas
+</code></pre>
+<p>After EIP-1559, a Type-2 transaction even explicitly contains:</p>
+<pre><code class="text">max_priority_fee_per_gas
+max_fee_per_gas
+</code></pre>
+<p>The Base Fee changes dynamically based on block utilization.</p>
+<p>Translated into adult language:</p>
+<p>You are not paying a processing fee.</p>
+<p>You are saying:</p>
+<blockquote>
+<p>What is the most I am willing to pay for a unit of computing;</p>
+</blockquote>
+<blockquote>
+<p>The maximum amount of money one is willing to give as a tip to the blocker;</p>
+</blockquote>
+<blockquote>
+<p>The protocol will also generate a dynamic base price based on the current congestion level;</p>
+</blockquote>
+<blockquote>
+<p>If the price is right, please help me execute this procedure.</p>
+</blockquote>
+<p>A user simply wants to:</p>
+<blockquote>
+<p>Swap 100 USDC.</p>
+</blockquote>
+<p>It turns out that the bottom layer of the wallet is actually helping him participate:</p>
+<p><strong>Real-time auction of globally distributed computing resources.</strong></p>
+<p>Then everyone praised:</p>
+<blockquote>
+<p>The wallet will now automatically estimate Gas, so users don’t need to understand it.</p>
+</blockquote>
+<p>Very good.</p>
+<p>The sentence itself is like saying:</p>
+<blockquote>
+<p>The engine start of our car requires manual adjustment of the fuel injection ratio, but now the instrument panel has automatically adjusted it for the user, so the experience is not bad.</p>
+</blockquote>
+<p>Really normal UX is:</p>
+<p><strong>This knob should never exist in the user’s cognitive world in the first place.</strong></p>
+<hr>
+<h1 id="7-Approve-is-an-anti-human-permission-model"><a href="#7-Approve-is-an-anti-human-permission-model" class="headerlink" title="7. Approve is an anti-human permission model"></a>7. Approve is an anti-human permission model</h1><p>Ethereum DeFi Another classic design:</p>
+<pre><code class="solidity">approve(spender, amount)
+</code></pre>
+<p>I want to Swap 100 USDC.</p>
+<p>Semantics for normal people:</p>
+<blockquote>
+<p>Spend my 100 USDC.</p>
+</blockquote>
+<p>The classic semantics of ERC-20 are:</p>
+<blockquote>
+<p>I authorize this address to actively withdraw up to N USDC from my account in the future.</p>
+</blockquote>
+<p>These two concepts are not the same thing at all.</p>
+<p>In the early years, in order to avoid having to Approve again every time they were used, a large number of applications simply allowed users to:</p>
+<pre><code class="text">Approve Unlimited
+</code></pre>
+<p>So:</p>
+<p>I just wanted to buy something once.</p>
+<p>The final authorization is:</p>
+<blockquote>
+<p>This smart contract can continue to move my Token in the future.</p>
+</blockquote>
+<p>Even more exciting is that the ERC-20 standard itself is about <code>approve()</code> The description left a historical scar:</p>
+<p>When modifying non-zero allowance, the client should consider <strong>First set allowance to 0, then set the new value</strong>, to reduce known attack vectors; but the standard cannot directly force this because it must be compatible with old contracts that have been deployed.</p>
+<p>Read this paragraph carefully.</p>
+<p>This is almost a microcosm of the user version of the previous article “How Dirty Is Ethereum Technology”:</p>
+<pre><code class="text">There is something wrong with the permissions model.
+
+↓
+
+Old standards cannot be modified.
+
+↓
+
+Let the client UI help avoid this.
+
+↓
+
+Because it has to be compatible with previous contracts.
+</code></pre>
+<p>Who will bear this historical debt in the end?</p>
+<p>User.</p>
+<p>So you will see some Tokens modify the allowance:</p>
+<p>First:</p>
+<pre><code class="text">Approve 0
+</code></pre>
+<p>Again:</p>
+<pre><code class="text">Approve 100
+</code></pre>
+<p>A normal “modification of the authorization limit” may turn into two on-chain status modifications.</p>
+<p>This is not financial innovation.</p>
+<p><strong>This is like operating a production environment where the database migration has never been completed.</strong></p>
+<hr>
+<h1 id="8-One-of-the-most-ridiculous-security-suggestions-Don’t-trust-the-Token’s-name-check-the-40-digit-hexadecimal-address"><a href="#8-One-of-the-most-ridiculous-security-suggestions-Don’t-trust-the-Token’s-name-check-the-40-digit-hexadecimal-address" class="headerlink" title="8. One of the most ridiculous security suggestions: Don’t trust the Token’s name, check the 40-digit hexadecimal address"></a>8. One of the most ridiculous security suggestions: Don’t trust the Token’s name, check the 40-digit hexadecimal address</h1><p>Ordinary financial systems identify an asset:</p>
+<pre><code class="text">USD
+</code></pre>
+<p>Crypto: </p>
+<pre><code class="text">USDC
+</code></pre>
+<p>Very good.</p>
+<p>Then discover that anyone can deploy a Token:</p>
+<pre><code class="text">name = USD Coin
+symbol = USDC
+logo = looks the same
+</code></pre>
+<p>What to do?</p>
+<p>Old Crypto users will tell newcomers very seriously:</p>
+<blockquote>
+<p>Don’t look at the name.</p>
+</blockquote>
+<blockquote>
+<p>Be sure to confirm the Contract Address.</p>
+</blockquote>
+<p>So to identify a kind of “dollar”, you ultimately need to identify:</p>
+<pre><code class="text">0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+</code></pre>
+<p>This kind of string.</p>
+<p>We even include:</p>
+<blockquote>
+<p>Will check Contract Address</p>
+</blockquote>
+<p>As a kind of Crypto literacy.</p>
+<p>No.</p>
+<p>This is not user literacy.</p>
+<p>This is <strong>The naming system basically has no survival skills that will be generated later.</strong></p>
+<p>Normal system faces:</p>
+<pre><code class="text">Microsoft.com
+</code></pre>
+<p>Does not tell users:</p>
+<blockquote>
+<p>Domain names can be easily spoofed, so remember the server’s IPv6 address for security reasons.</p>
+</blockquote>
+<p>This is pretty much what Web3 does.</p>
+<hr>
+<h1 id="9-Ethereum’s-“signature”-may-be-the-most-dangerous-confirmation-button-on-the-entire-consumer-internet"><a href="#9-Ethereum’s-“signature”-may-be-the-most-dangerous-confirmation-button-on-the-entire-consumer-internet" class="headerlink" title="9. Ethereum’s “signature” may be the most dangerous confirmation button on the entire consumer internet"></a>9. Ethereum’s “signature” may be the most dangerous confirmation button on the entire consumer internet</h1><p>Common products:</p>
+<pre><code class="text">Confirm
+</code></pre>
+<p>Usually means:</p>
+<p>Confirm the matter in front of you.</p>
+<p>Ethereum wallet:</p>
+<pre><code class="text">Sign
+</code></pre>
+<p>May mean:</p>
+<p>Prove you control this address.</p>
+<p>Probably login.</p>
+<p>Probably an order.</p>
+<p>Probably Permit.</p>
+<p>Maybe authorization.</p>
+<p>Probably Typed Data.</p>
+<p>It may eventually allow another protocol to have some kind of asset operation rights.</p>
+<p>The common actions seen by users are:</p>
+<p><strong>Sign.</strong></p>
+<p>What’s really outrageous is:</p>
+<p>Ethereum’s security model is based on very reliable cryptographic signatures.</p>
+<p>But user security is often based on:</p>
+<blockquote>
+<p>I hope users can understand what they are signing.</p>
+</blockquote>
+<p>Cryptography can prove:</p>
+<p><strong>It was indeed you who signed it.</strong></p>
+<p>Cryptography cannot prove:</p>
+<p><strong>Do you know what you signed?</strong></p>
+<p>Between these two things lies the entire Crypto Scam industry.</p>
+<hr>
+<h1 id="10-Then-EIP-7702-pushed-this-matter-to-a-new-level-once-authorized-EOA-can-start-executing-other-people’s-code"><a href="#10-Then-EIP-7702-pushed-this-matter-to-a-new-level-once-authorized-EOA-can-start-executing-other-people’s-code" class="headerlink" title="10. Then EIP-7702 pushed this matter to a new level: once authorized, EOA can start executing other people’s code"></a>10. Then EIP-7702 pushed this matter to a new level: once authorized, EOA can start executing other people’s code</h1><p>Ethereum found EOA too weak.</p>
+<p>What to do?</p>
+<p>EIP-7702.</p>
+<p>Now EOA can delegate the account execution logic to a piece of contract code through authorization.</p>
+<p>This allows for very powerful wallet capabilities indeed.</p>
+<p>But EIP-7702’s own security chapter said something extremely interesting:</p>
+<p><strong>Applications should not directly give users an interface to allow users to sign delegation authorization at will.</strong></p>
+<p>Why?</p>
+<p>Because authorized code can have great control over the account, ordinary users do not have the ability to audit what code they have been given by the delegate.</p>
+<p>The original EIP even clearly states:</p>
+<blockquote>
+<p>There is no secure universal interface that simply solves this problem; few users have the expertise to properly scrutinize delegation code.</p>
+</blockquote>
+<p>Please appreciate this technological evolution process:</p>
+<p>First generation:</p>
+<pre><code class="text">The private key controls the account.
+</code></pre>
+<p>Everyone thinks the function is too weak.</p>
+<p>So the next generation:</p>
+<pre><code class="text">Users can sign,
+Let your account execute the code of another address.
+</code></pre>
+<p>The protocol designer must then alert the wallet:</p>
+<p><strong>Never let users sign this casually.</strong></p>
+<p>This is already very Ethereum.</p>
+<p>Add an ability.</p>
+<p>Then add a whole set of security infrastructure,</p>
+<p>Prevent users from actually using this ability directly.</p>
+<hr>
+<h1 id="11-Public-mempool-You-even-have-to-tell-the-world-publicly-how-you-plan-to-trade-first-and-then-pray-that-no-one-makes-money-from-you"><a href="#11-Public-mempool-You-even-have-to-tell-the-world-publicly-how-you-plan-to-trade-first-and-then-pray-that-no-one-makes-money-from-you" class="headerlink" title="11. Public mempool: You even have to tell the world publicly how you plan to trade first, and then pray that no one makes money from you."></a>11. Public mempool: You even have to tell the world publicly how you plan to trade first, and then pray that no one makes money from you.</h1><p>This is where I think the Ethereum user experience is the most “cyberpunk”.</p>
+<p>You want to buy a Token on a DEX.</p>
+<p>So the transaction is broadcast.</p>
+<p>The transaction has not been uploaded to the chain yet.</p>
+<p>But searchers can see:</p>
+<blockquote>
+<p>This person wants to buy it immediately.</p>
+</blockquote>
+<p>This can then be sorted around your transactions.</p>
+<p>For example the most notorious:</p>
+<p><strong>Sandwich Attack.</strong></p>
+<p>Attacker:</p>
+<p>Buy before you do.</p>
+<p>Your trade drives the price higher.</p>
+<p>Then sell it behind you.</p>
+<p>Where does the profit come from?</p>
+<p>Because you get a worse closing price.</p>
+<p>Ethereum’s official MEV documentation is very direct in admitting that sandwich trading will cause users to suffer larger slippage and worse transaction execution.</p>
+<p>That is to say:</p>
+<p>When a user is ready to trade on Ethereum, the default model has long been approximately:</p>
+<pre><code class="text">First broadcast your trading intentions to the world
+
+↓
+
+Tell everyone:
+what do i want to buy
+How much to buy
+How much slippage are you willing to accept?
+
+↓
+
+wait for others to decide
+Is there a way to make money by plugging things in before and after your trades?
+</code></pre>
+<p>What does this look like?</p>
+<p>You walk into the stock exchange and shout:</p>
+<blockquote>
+<p>I want to buy this stock at market price for $5 million!</p>
+</blockquote>
+<p>Then all high-frequency traders hear it first.</p>
+<p>After the transaction, you ask again:</p>
+<blockquote>
+<p>Why is the transaction price so bad?</p>
+</blockquote>
+<p>Others answered:</p>
+<blockquote>
+<p>This is MEV.</p>
+</blockquote>
+<p>What does an ordinary person need to know?</p>
+<pre><code class="text">Private RPC
+MEV Protection
+Slippage
+Sandwich
+Builder
+Searcher
+</code></pre>
+<p>Only in this way can an exchange be completed more safely.</p>
+<p>We actually call this system:</p>
+<p><strong>Permissionless Finance.</strong></p>
+<p>Permissionless indeed.</p>
+<p>Even the people who steal your slippage are permissionless.</p>
+<hr>
+<h1 id="12-Slippage-itself-is-a-very-ridiculous-user-input-item"><a href="#12-Slippage-itself-is-a-very-ridiculous-user-input-item" class="headerlink" title="12. Slippage itself is a very ridiculous user input item"></a>12. Slippage itself is a very ridiculous user input item</h1><p>DEX also has a magical setting:</p>
+<pre><code class="text">Slippage Tolerance
+0.5%
+1%
+5%
+</code></pre>
+<p>What ordinary users want to express is:</p>
+<blockquote>
+<p>Help me buy ETH with 1000 USDC.</p>
+</blockquote>
+<p>Ethereum DeFi asked him to answer:</p>
+<blockquote>
+<p>When the trade is actually executed, if the market state changes, how much worse than the current Quote would you allow the final result to be?</p>
+</blockquote>
+<p>This essentially lets the user configure it themselves:</p>
+<p><strong>Transaction execution protection parameters.</strong></p>
+<p>Set too low:</p>
+<p>Transaction revert.</p>
+<p>Gas may be wasted.</p>
+<p>Set too high:</p>
+<p>You may encounter poor prices and even expand the profit margin of the sandwich.</p>
+<p>What user experience is this?</p>
+<p>Users need to:</p>
+<pre><code class="text">Transaction failure risk
+</code></pre>
+<p>and:</p>
+<pre><code class="text">Risk of value being extracted by others
+</code></pre>
+<p>Manually adjust a slider between them.</p>
+<p>Then the UI tells you:</p>
+<blockquote>
+<p>0.5% is recommended.</p>
+</blockquote>
+<p>Very modern.</p>
+<hr>
+<h1 id="13-The-most-Ethereum-product-logic-the-system-creates-problems-first-and-then-lets-the-wallet-invent-a-“smart-mode”-to-cover-it-up"><a href="#13-The-most-Ethereum-product-logic-the-system-creates-problems-first-and-then-lets-the-wallet-invent-a-“smart-mode”-to-cover-it-up" class="headerlink" title="13. The most Ethereum product logic: the system creates problems first, and then lets the wallet invent a “smart mode” to cover it up"></a>13. The most Ethereum product logic: the system creates problems first, and then lets the wallet invent a “smart mode” to cover it up</h1><p>Nonce is difficult to use?</p>
+<p>Wallet Plus:</p>
+<pre><code class="text">Speed Up
+Cancel
+</code></pre>
+<p>Gas is difficult to understand?</p>
+<p>Wallets are automatically estimated.</p>
+<p>Have a problem with MEV?</p>
+<p>Add:</p>
+<pre><code class="text">MEV Protection
+</code></pre>
+<p>Approve Danger?</p>
+<p>Wallet does:</p>
+<pre><code class="text">Allowance Warning
+</code></pre>
+<p>Can’t read the signature?</p>
+<p>The wallet starts a simulated transaction.</p>
+<p>Too many L2s?</p>
+<p>Wallet hidden network.</p>
+<p>Account too weak?</p>
+<ol start="4337">
+<li></li>
+</ol>
+<p>Gas Token trouble?</p>
+<p>Paymaster.</p>
+<p>EOA too weak?</p>
+<ol start="7702">
+<li></li>
+</ol>
+<p>You will find an amazing rule of Ethereum:</p>
+<p><strong>Every time the bottom layer leaves an abstraction that is not suitable for ordinary people, the upper layer needs to grow a whole set of products to hide this abstraction.</strong></p>
+<p>We then call the new infrastructure resulting from hidden complexity:</p>
+<p><strong>Innovation.</strong></p>
+<hr>
+<h1 id="14-ERC-4337-is-more-like-evidence-Ethereum’s-original-transaction-model-is-no-longer-suitable-for-modern-users"><a href="#14-ERC-4337-is-more-like-evidence-Ethereum’s-original-transaction-model-is-no-longer-suitable-for-modern-users" class="headerlink" title="14. ERC-4337 is more like evidence: Ethereum’s original transaction model is no longer suitable for modern users."></a>14. ERC-4337 is more like evidence: Ethereum’s original transaction model is no longer suitable for modern users.</h1><p>Let’s take a look at what 4337 is solving:</p>
+<p>Gas Sponsorship.</p>
+<p>Batch Calls.</p>
+<p>Smart Account.</p>
+<p>Custom authentication.</p>
+<p>Account recovery.</p>
+<p>ERC-20 pays for Gas.</p>
+<p>Sounds good.</p>
+<p>But these needs actually prove one thing:</p>
+<p><strong>Raw Ethereum Transactions are simply not enough anymore.</strong></p>
+<p>So 4337 did something extremely Ethereum.</p>
+<p>Don’t change the bottom layer.</p>
+<p>On the underlying trading system:</p>
+<p><strong>Re-implement a transaction-like system.</strong></p>
+<p>It even deliberately doesn’t call its object Transaction.</p>
+<p>And call:</p>
+<pre><code class="text">UserOperation
+</code></pre>
+<p>Then add:</p>
+<pre><code class="text">UserOperation
+Bundler
+EntryPoint
+Paymaster
+Factory
+Aggregator
+UserOp Mempool
+</code></pre>
+<p>The official specification of ERC-4337 clearly states that it uses an additional mempool,<code>UserOperation</code>, Bundler and <code>EntryPoint</code>, avoid modifying the Ethereum consensus layer.</p>
+<p>It’s like the process model of an operating system is really difficult to use.</p>
+<p>But the ABI cannot be changed.</p>
+<p>What to do?</p>
+<p>Recreate it in user mode:</p>
+<p><strong>Bare operating system.</strong></p>
+<p>And then finally achieved:</p>
+<blockquote>
+<p>Ordinary users don’t need to understand Gas.</p>
+</blockquote>
+<p>How touching.</p>
+<p>In order for users to finally not have to understand Ethereum,</p>
+<p>Ethereum first implements another layer of Ethereum on top of Ethereum.</p>
+<hr>
+<h1 id="15-Even-4337’s-“users-don’t-need-to-worry-about-Gas”-requires-an-entire-shadow-financial-system-behind-it"><a href="#15-Even-4337’s-“users-don’t-need-to-worry-about-Gas”-requires-an-entire-shadow-financial-system-behind-it" class="headerlink" title="15. Even 4337’s “users don’t need to worry about Gas” requires an entire shadow financial system behind it."></a>15. Even 4337’s “users don’t need to worry about Gas” requires an entire shadow financial system behind it.</h1><p>Users see:</p>
+<blockquote>
+<p>Gas Sponsored</p>
+</blockquote>
+<p>Very simple.</p>
+<p>What’s behind the scenes?</p>
+<p>Paymaster.</p>
+<p>Paymaster needs to deposit ETH to EntryPoint first.</p>
+<p>Bundler needs to determine whether the Paymaster is willing to pay.</p>
+<p>UserOperation also needs to be mocked.</p>
+<p>Validation logic needs to be checked.</p>
+<p>Paymaster may cause DoS.</p>
+<p>Bundler even needs to impose reputation&#x2F;staking constraints on certain entities.</p>
+<p>That is to say, in order to implement an ordinary function in the Web2 world:</p>
+<blockquote>
+<p>Merchants help users pay operating costs.</p>
+</blockquote>
+<p>What Ethereum creates is:</p>
+<pre><code class="text">User
+ ↓
+Smart Account
+ ↓
+UserOperation
+ ↓
+Bundler
+ ↓
+Paymaster Validation
+ ↓
+EntryPoint
+ ↓
+Ethereum Transaction
+ ↓
+Block
+</code></pre>
+<p>User last saw:</p>
+<pre><code class="text">Fee: $0
+</code></pre>
+<p>Then everyone said:</p>
+<blockquote>
+<p>See, Web3 UX is already the same as Web2.</p>
+</blockquote>
+<p>Yes.</p>
+<p><strong>Just bury seven layers of infrastructure beneath the button.</strong></p>
+<hr>
+<h1 id="16-The-most-absurd-thing-about-Layer-2-is-not-the-“liquidity-split”-but-that-Ethereum-even-makes-the-concept-of-“balance”-no-longer-complete"><a href="#16-The-most-absurd-thing-about-Layer-2-is-not-the-“liquidity-split”-but-that-Ethereum-even-makes-the-concept-of-“balance”-no-longer-complete" class="headerlink" title="16. The most absurd thing about Layer 2 is not the “liquidity split”, but that Ethereum even makes the concept of “balance” no longer complete."></a>16. The most absurd thing about Layer 2 is not the “liquidity split”, but that Ethereum even makes the concept of “balance” no longer complete.</h1><p>L2 liquidity fragmentation has been talked about badly.</p>
+<p>What’s really worth complaining about is:</p>
+<p><strong>The Ethereum ecosystem turns “how much money do I have” from a scalar into a vector.</strong></p>
+<p>Previously:</p>
+<pre><code class="text">balance = 10,000 USDC
+</code></pre>
+<p>Now it’s actually closer:</p>
+<pre><code class="text">balance = &#123;
+  Ethereum: 2000,
+  Base: 3500,
+  Arbitrum: 4000,
+  Optimism: 500
+&#125;
+</code></pre>
+<p>And that doesn’t even include:</p>
+<p>native USDC.</p>
+<p>bridged USDC.</p>
+<p>Representation of other bridges.</p>
+<p>So the wallet shows:</p>
+<blockquote>
+<p>Total Balance: $10,000</p>
+</blockquote>
+<p>This is actually a UI illusion.</p>
+<p>Because of this $10,000:</p>
+<p><strong>Availability is not always the same at all times.</strong></p>
+<p>The total assets are the same,</p>
+<p>But the state space is different.</p>
+<p>Can you use it right now?</p>
+<p>Depends on:</p>
+<p>Which Rollup.</p>
+<p>Which Token Contract.</p>
+<p>Is there any Gas?</p>
+<p>Where the application is deployed.</p>
+<p>Is there any bridge liquidity?</p>
+<p>This is L2’s biggest UX failure.</p>
+<p><strong>Ethereum turns “balance”, a concept that humans have understood very clearly for thousands of years, into a distributed system problem.</strong></p>
+<hr>
+<h1 id="17-Smart-accounts-even-make-“what-is-my-address”-complicated-again"><a href="#17-Smart-accounts-even-make-“what-is-my-address”-complicated-again" class="headerlink" title="17. Smart accounts even make “what is my address” complicated again?"></a>17. Smart accounts even make “what is my address” complicated again?</h1><p>EOA has great benefits:</p>
+<p>The same private key can get the same address in a large number of EVM networks.</p>
+<p>Then we started embracing Smart Account.</p>
+<p>The problem arises:</p>
+<p>Smart accounts are contracts.</p>
+<p>The contract address depends on the deployment mechanism, factory, salt, init code and other conditions.</p>
+<p>In order for the same smart account to have a consistent address in different chains, the ecosystem even needs to rely specifically on <code>CREATE2</code>, deterministic deployment factory, counterfactual deployment and other mechanisms.</p>
+<p>The motivation of EIP-7955 even states directly:</p>
+<p><strong>Letting contracts have the same address and code in multiple chains is a difficult problem in itself.</strong></p>
+<p>So we took a very strange route:</p>
+<pre><code class="text">EOA: 
+The function is too simple,
+But the address is easy to understand.
+
+↓
+
+Smart Account: 
+The functionality is finally enriched.
+
+↓
+
+Wait,
+Now I have to figure out how to open my account
+It is still &quot;the same account&quot; in different chains.
+</code></pre>
+<p>Many advances in Ethereum have this flavor:</p>
+<p><strong>Solve an old problem and create a new, more advanced problem.</strong></p>
+<hr>
+<h1 id="18-The-ultimate-absurdity-of-Ethereum-the-most-advanced-cryptography-system-but-in-the-end-it-relies-on-the-wallet-to-guess-what-the-user-wants-to-do"><a href="#18-The-ultimate-absurdity-of-Ethereum-the-most-advanced-cryptography-system-but-in-the-end-it-relies-on-the-wallet-to-guess-what-the-user-wants-to-do" class="headerlink" title="18. The ultimate absurdity of Ethereum: the most advanced cryptography system, but in the end it relies on the wallet to guess what the user wants to do."></a>18. The ultimate absurdity of Ethereum: the most advanced cryptography system, but in the end it relies on the wallet to guess what the user wants to do.</h1><p>Today’s wallets are increasingly emphasizing:</p>
+<p>Transaction Simulation.</p>
+<p>Why?</p>
+<p>Because users simply can’t understand:</p>
+<pre><code class="text">to
+value
+data
+</code></pre>
+<p>I also don’t understand what state changes will ultimately result from the contract call.</p>
+<p>So the wallet starts before actually sending:</p>
+<p><strong>Run the simulation first.</strong></p>
+<p>Then tell the user:</p>
+<blockquote>
+<p>Expect to lose 100 USDC.</p>
+</blockquote>
+<blockquote>
+<p>You can expect to get 0.03 ETH.</p>
+</blockquote>
+<p>This is certainly a huge UX improvement.</p>
+<p>But it is also an extremely ironic fact:</p>
+<p>Ethereum’s original transaction format provides information to users,</p>
+<p><strong>It is no longer enough for an ordinary person to know what will happen after he signs.</strong></p>
+<p>So the wallet needs to run EVM.</p>
+<p>Internal calls need to be traced.</p>
+<p>Need to parse Token Transfer.</p>
+<p>Need to identify malicious contracts.</p>
+<p>Then translate all this into human language.</p>
+<p>We ended up with an amazing architecture:</p>
+<pre><code class="text">people
+ ↓
+wallet
+ ↓
+trading simulator
+ ↓
+RPC
+ ↓
+EVM
+ ↓
+smart contract
+ ↓
+Back to the wallet
+ ↓
+Tell humans:
+&quot;This is probably what you wanted to do just now.&quot;
+</code></pre>
+<p>Behind a confirmation button,</p>
+<p>Running half a blockchain analysis system.</p>
+<hr>
+<h1 id="19-The-biggest-problem-with-Ethereum-is-no-longer-“not-simple-enough”-but-that-it-has-almost-no-ability-to-become-simple-again"><a href="#19-The-biggest-problem-with-Ethereum-is-no-longer-“not-simple-enough”-but-that-it-has-almost-no-ability-to-become-simple-again" class="headerlink" title="19. The biggest problem with Ethereum is no longer “not simple enough”, but that it has almost no ability to become simple again."></a>19. The biggest problem with Ethereum is no longer “not simple enough”, but that it has almost no ability to become simple again.</h1><p>If Ethereum were a startup internal system:</p>
+<p>Refactor.</p>
+<p>Delete EOA.</p>
+<p>Unified account model.</p>
+<p>Change the Token standard.</p>
+<p>Redesign Gas.</p>
+<p>Deprecated Legacy Transaction.</p>
+<p>Redesign permissions.</p>
+<p>Even redesign the execution model.</p>
+<p>But Ethereum can’t do that.</p>
+<p>The reason is precisely that it succeeded.</p>
+<p>Hundreds of billions of dollars in assets.</p>
+<p>More than ten years of history.</p>
+<p>Countless contracts.</p>
+<p>Countless wallets.</p>
+<p>Countless assumptions.</p>
+<p>All must continue to work.</p>
+<p>So:</p>
+<p>ETH is not ERC-20?</p>
+<p>Can’t do it again.</p>
+<p>Pack a WETH.</p>
+<p>EOA too weak?</p>
+<p>Cannot be deleted.</p>
+<p>Add 4337.</p>
+<p>4337 Not native enough?</p>
+<p>Add 7702 more.</p>
+<p>The account has no gas?</p>
+<p>Add Paymaster.</p>
+<p>Public mempool is MEV?</p>
+<p>Engage in Private Orderflow.</p>
+<p>Bad experience with Nonce?</p>
+<p>The wallet does transaction replacement.</p>
+<p>Approve Danger?</p>
+<p>The wallet does reminders, simulations, and revokes.</p>
+<p>Too much L2 too broken?</p>
+<p>Engage in Chain Abstraction.</p>
+<p>You will find:</p>
+<p><strong>Ethereum has rarely truly eliminated complexity.</strong></p>
+<p>What it is better at is:</p>
+<p><strong>Wrap up the old complexity and add another layer of abstraction.</strong></p>
+<hr>
+<h1 id="20-So-the-really-scary-thing-about-Ethereum-is-not-that-it’s-difficult-to-use"><a href="#20-So-the-really-scary-thing-about-Ethereum-is-not-that-it’s-difficult-to-use" class="headerlink" title="20. So the really scary thing about Ethereum is not that it’s difficult to use"></a>20. So the really scary thing about Ethereum is not that it’s difficult to use</h1><p>“Ethereum is difficult to use” is actually speaking for it.</p>
+<p>Because “difficult to use” sounds like:</p>
+<p>The UI still needs to be optimized.</p>
+<p>The buttons also need adjusting.</p>
+<p>The novice tutorial still needs to be improved.</p>
+<p>No.</p>
+<p>A more accurate statement would be:</p>
+<p><strong>Ethereum massively outsources the complexity that a distributed computer should bear on its own to wallets, application developers, and ultimately, inevitably, users.</strong></p>
+<p>So an ordinary person just thinks:</p>
+<blockquote>
+<p>Take USDC and buy ETH.</p>
+</blockquote>
+<p>There may be something behind it:</p>
+<pre><code class="text">Is your ETH WETH?
+
+Which chain are you on?
+
+Do you have Native ETH?
+
+Is Allowance enough?
+
+Do you want Approve?
+
+Approve How much?
+
+How much gas?
+
+How much is the base fee?
+
+How much is the Priority Fee?
+
+What is the Nonce?
+
+Is there any Pending Transaction in front?
+
+How much does Slippage set?
+
+Will it be Sandwiched?
+
+Will the transaction be Revert?
+
+Are wallet simulation results trustworthy?
+
+Go Public RPC or Protected RPC?
+
+Is this a Transaction or a UserOperation?
+
+Who is Bundler?
+
+Is there a Paymaster?
+</code></pre>
+<p>Then the industry tells you:</p>
+<blockquote>
+<p>Mass Adoption is coming.</p>
+</blockquote>
+<hr>
+<h1 id="Conclusion-A-truly-successful-financial-protocol-should-make-users-more-and-more-stupid"><a href="#Conclusion-A-truly-successful-financial-protocol-should-make-users-more-and-more-stupid" class="headerlink" title="Conclusion: A truly successful financial protocol should make users more and more stupid"></a>Conclusion: A truly successful financial protocol should make users more and more stupid</h1><p>“Stupid” here is not a derogatory term.</p>
+<p>It is precisely the highest state of technical success.</p>
+<p>When you swipe your credit card,</p>
+<p>Understanding ISO 8583 is not required.</p>
+<p>When you use HTTPS,</p>
+<p>No need to check TLS handshake.</p>
+<p>When you send an email,</p>
+<p>No need to know about SMTP relay.</p>
+<p>When you turn on your phone,</p>
+<p>No need to know the virtual memory page table.</p>
+<p>The more mature the technology,</p>
+<p>The less the user needs to know.</p>
+<p>Ethereum has been doing exactly the opposite for a long time.</p>
+<p>The more deeply you use it, the</p>
+<p>The more there is to understand.</p>
+<p>What is the last so-called “Crypto Native User” actually?</p>
+<p>Not an ordinary consumer.</p>
+<p>But a trained one:</p>
+<p><strong>Part-time wallet security engineer + Gas trader + RPC operation and maintenance + smart contract auditor + cross-chain liquidator.</strong></p>
+<p>He knows how to change RPC.</p>
+<p>Know how to change the nonce.</p>
+<p>Know how to replace a transaction.</p>
+<p>Know how to revoke allowance.</p>
+<p>Know the difference between ETH and WETH.</p>
+<p>Know how to read Contract Address.</p>
+<p>Know how to avoid a sandwich.</p>
+<p>Understand the circumstances under which transaction revert will burn gas.</p>
+<p>Know when to use bridge.</p>
+<p>Even know what Bundler and Paymaster are.</p>
+<p>Then the man turned to the newcomer and said:</p>
+<blockquote>
+<p>Ethereum is actually not difficult, you will get used to it after using it a few times.</p>
+</blockquote>
+<p>The sentence itself,</p>
+<p>Perhaps this is the best epitaph for the failure of Ethereum user experience.</p>
+<p><strong>Not that Ethereum is finally simple.</strong></p>
+<p><strong>It was you who were finally trained as a protocol engineer.</strong></p>
+</div></div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.2"></script><script defer src="/js/highlight.min.js?v=v1.2"></script><script defer src="/js/main.js?v=v1.2"></script><script defer src="/js/lightbox.js?v=v1.2"></script><script defer src="/js/bootstrap.min.js?v=v1.2"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>

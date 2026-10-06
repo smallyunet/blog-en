@@ -1,0 +1,928 @@
+<!-- Stable asset version (for cache busting without full-site churn)--><!DOCTYPE html><html lang="en"><head><title>Arc: Born on Ethereum, Without Its Dirtiest Component (ETH)</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><!-- Mobile viewport: include viewport-fit=cover to allow CSS safe-area usage on full-screen devices--><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><!-- iOS Safari / PWA status bar style (use default so text stays legible on light background)--><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- SEO basics--><meta name="description"><!-- Open Graph & Twitter--><link rel="canonical" href="https://en.smallyu.net/2026/09/25/arc-born-on-ethereum-without-eth/"><meta property="og:title" content="Arc: Born on Ethereum, Without Its Dirtiest Component (ETH)"><meta property="og:type" content="article"><meta property="og:url" content="https://en.smallyu.net/2026/09/25/arc-born-on-ethereum-without-eth/"><meta property="og:site_name" content="smallyu‘s Blog"><meta name="twitter:card" content="summary_large_image"><!-- Browser UI color--><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><!-- stylesheets--><!-- Use a stable, configurable asset version to prevent full-site churn on every build.--><!-- Set `asset_version` in theme _config.yml when you actually change CSS/JS.--><link rel="stylesheet" href="/css/xcode.min.css?v=v1.2"><link rel="stylesheet" href="/css/post.css?v=v1.2"><!-- unified typography overrides for both home and post pages--><link rel="stylesheet" href="/css/typography.css?v=v1.2"><link rel="stylesheet" href="/css/ai-content.css?v=5"><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="smallyu‘s Blog" type="application/atom+xml">
+</head><body><div><div class="inner"><h1>Arc: Born on Ethereum, Without Its Dirtiest Component (ETH)</h1><div class="time">2026-09-25</div><div class="title-margin"></div><div class="ai-content"><p>In the previous two articles, I discussed two issues about Ethereum respectively.</p>
+<p>One is:</p>
+<p><strong>How dirty is Ethereum’s technical architecture?</strong></p>
+<p>Another one is:</p>
+<p><strong>How Ethereum leaks its complexity to users.</strong></p>
+<p>The historical special logic of The DAO.</p>
+<p>More than a decade of Hard Fork deposition.</p>
+<p>EOA.</p>
+<p>WETH.</p>
+<p>Approve.</p>
+<p>Nonce.</p>
+<p>Gas Token.</p>
+<p>ERC-4337.</p>
+<p>Bundler.</p>
+<p>Paymaster.</p>
+<p>EIP-7702.</p>
+<p>Blob.</p>
+<p>Rollup.</p>
+<p>Bridge.</p>
+<p>MEV.</p>
+<p>All of this can be explained individually.</p>
+<p>But when stacked together, they form an increasingly larger system that is increasingly difficult to escape from history.</p>
+<p>So here is a very interesting question:</p>
+<p><strong>If we were to rebuild a chain today, could we only use what Ethereum has proven to be useful, instead of Ethereum itself?</strong></p>
+<p>Circle’s Arc gives an interesting answer.</p>
+<p>My judgment is:</p>
+<p><strong>The most noteworthy thing about Arc is not how many new technologies it invented.</strong></p>
+<p>Quite the opposite.</p>
+<p>What’s really smart about it is that it knows what things don’t necessarily need to be reinvented.</p>
+<p>EVM?</p>
+<p>Bring it.</p>
+<p>Solidity?</p>
+<p>Bring it.</p>
+<p>Ethereum development toolchain?</p>
+<p>Bring it.</p>
+<p>Mature wallet system?</p>
+<p>Bring it.</p>
+<p>The development paradigm accumulated by the smart contract ecosystem?</p>
+<p>Bring them all.</p>
+<p>However:</p>
+<p>ETH?</p>
+<p>Don’t.</p>
+<p>Ethereum consensus?</p>
+<p>Don’t.</p>
+<p>Economic security of Ethereum?</p>
+<p>Don’t.</p>
+<p>Rollup route for Ethereum?</p>
+<p>No inheritance is required.</p>
+<p>The historical politics of Ethereum after more than ten years?</p>
+<p>It has nothing to do with me.</p>
+<p>Ethereum’s economic model where “you must have a volatile native token to use the blockchain”?</p>
+<p>Just throw it away.</p>
+<p>This is where Arc gets really interesting.</p>
+<p><strong>It was born in the technical world of Ethereum, but does not need to live in the economic world of Ethereum.</strong></p>
+<hr>
+<h1 id="1-Arc’s-cleanest-move-There-is-no-need-to-create-an-“ARC-Coin”-for-this-chain"><a href="#1-Arc’s-cleanest-move-There-is-no-need-to-create-an-“ARC-Coin”-for-this-chain" class="headerlink" title="1. Arc’s cleanest move: There is no need to create an “ARC Coin” for this chain."></a>1. Arc’s cleanest move: There is no need to create an “ARC Coin” for this chain.</h1><p>Almost all public blockchains have a very deep-rooted logic:</p>
+<p>I want to build a chain.</p>
+<p>So I want to send a coin.</p>
+<p>Ethereum has ETH.</p>
+<p>Solana has SOL.</p>
+<p>Avalanche has AVAX.</p>
+<p>BNB Chain has BNB.</p>
+<p>Then this coin bears:</p>
+<p>Gas.</p>
+<p>Pledge.</p>
+<p>Security budget.</p>
+<p>Ecological incentives.</p>
+<p>Governance.</p>
+<p>Speculation.</p>
+<p>Asset pricing.</p>
+<p>So a person who originally just wanted to use the blockchain was forced to participate in an asset speculation first.</p>
+<p>You just want to transfer $1000.</p>
+<p>The system first asked:</p>
+<blockquote>
+<p>Have you bought our Coin?</p>
+</blockquote>
+<p>This is one of the most common and strange things that has happened in Crypto for more than ten years.</p>
+<p>Arc just cuts this layer off.</p>
+<p><strong>Arc’s Gas uses USDC.</strong></p>
+<p>Not:</p>
+<pre><code class="text">ARC
+</code></pre>
+<p>Not:</p>
+<pre><code class="text">ARC Gas Token
+</code></pre>
+<p>Not:</p>
+<pre><code class="text">First buy some Arc Coin on the exchange,
+Then transfer it to your wallet to pay the handling fee.
+</code></pre>
+<p>That is:</p>
+<pre><code class="text">USDC
+</code></pre>
+<p>Circle describes Arc’s design very clearly:</p>
+<blockquote>
+<p>Gas in dollars.</p>
+</blockquote>
+<p>Transaction fees are paid directly by USDC, eliminating the need to hold volatile native tokens.</p>
+<p>On the surface this thing is just:</p>
+<p><strong>Changed Gas Token.</strong></p>
+<p>It’s actually far more important than that.</p>
+<p>Because it separates two concepts that have long been tied together in the blockchain world very cleanly for the first time:</p>
+<pre><code class="text">use network
+≠
+Investment Network Token
+</code></pre>
+<p>This is a very important change in thinking.</p>
+<hr>
+<h1 id="2-On-Ethereum-“using-Ethereum”-and-“holding-ETH”-have-never-been-truly-separated"><a href="#2-On-Ethereum-“using-Ethereum”-and-“holding-ETH”-have-never-been-truly-separated" class="headerlink" title="2. On Ethereum, “using Ethereum” and “holding ETH” have never been truly separated."></a>2. On Ethereum, “using Ethereum” and “holding ETH” have never been truly separated.</h1><p>This is also where I always think Ethereum is extremely unclean.</p>
+<p>Suppose a company says:</p>
+<blockquote>
+<p>I just want to settle USD.</p>
+</blockquote>
+<p>On Ethereum it still has to face a completely unrelated problem:</p>
+<blockquote>
+<p>How much is ETH today?</p>
+</blockquote>
+<p>Because in the end Gas is ETH.</p>
+<p>So a strange asset will appear in the corporate financial system:</p>
+<pre><code class="text">USDC
+</code></pre>
+<p>This is the money I want to use.</p>
+<p>and:</p>
+<pre><code class="text">ETH
+</code></pre>
+<p>This is how I use the money,
+Extra money that had to be held.</p>
+<p>Then the finance department has to answer:</p>
+<p>How much ETH should I keep?</p>
+<p>What should I do if the price drops?</p>
+<p>What is the dollar cost of gas after the price increase?</p>
+<p>When should I replenish gas?</p>
+<p>How much ETH are needed for each address?</p>
+<p>Is Treasury allowed to hold volatile crypto assets?</p>
+<p>How to record this asset?</p>
+<p>This is not a business requirement.</p>
+<p>This is a requirement that the protocol imposes on the business.</p>
+<p>In fact, when Circle originally released Arc, it directly wrote out the company’s feedback:</p>
+<p>Businesses told Circle:</p>
+<blockquote>
+<p>“Our Treasury team cannot hold volatile Crypto Assets in order to pay for gas.”</p>
+</blockquote>
+<p>So the answer given by Arc is surprisingly simple:</p>
+<p><strong>Then don’t hold it.</strong></p>
+<p>This is called real problem solving.</p>
+<p>Not:</p>
+<p>Design a Paymaster.</p>
+<p>Not:</p>
+<p>Design Gas Station.</p>
+<p>Not:</p>
+<p>Account abstraction on Ethereum.</p>
+<p>Not:</p>
+<p>The background helps users Swap ETH.</p>
+<p>Not:</p>
+<p>Sponsor Gas.</p>
+<p>Instead:</p>
+<p><strong>Gas is originally dollars.</strong></p>
+<p>Cut away the entire problem in one fell swoop.</p>
+<hr>
+<h1 id="3-This-is-the-difference-between-“clean-architecture”-and-“patch-architecture”"><a href="#3-This-is-the-difference-between-“clean-architecture”-and-“patch-architecture”" class="headerlink" title="3. This is the difference between “clean architecture” and “patch architecture”"></a>3. This is the difference between “clean architecture” and “patch architecture”</h1><p>How does Ethereum solve the problem of users not wanting to hold ETH to pay Gas?</p>
+<p>The answer is increasingly complex.</p>
+<p>ERC-4337.</p>
+<p>Paymaster.</p>
+<p>Smart Account.</p>
+<p>Bundler.</p>
+<p>EntryPoint.</p>
+<p>Push native account abstraction even further.</p>
+<p>All this technology is certainly very clever.</p>
+<p>But looking back from the product issues, you will find an absurdity:</p>
+<p>The user’s problem is actually just:</p>
+<blockquote>
+<p>I obviously have USDC, why can’t I use USDC to pay transaction fees?</p>
+</blockquote>
+<p>The answer given by Ethereum gradually became:</p>
+<pre><code class="text">Smart Account
+    ↓
+UserOperation
+    ↓
+Bundler
+    ↓
+Paymaster
+    ↓
+EntryPoint
+    ↓
+ETH
+</code></pre>
+<p>Arc: </p>
+<pre><code class="text">USDC
+ ↓
+Gas
+</code></pre>
+<p>It’s over.</p>
+<p>This is what I call:</p>
+<p><strong>Clean.</strong></p>
+<p>When advanced technology is most impressive, it is not when it creates five more layers of abstraction.</p>
+<p>Instead, it was discovered that four of the layers did not need to exist at all.</p>
+<hr>
+<h1 id="4-The-smartest-thing-about-Arc-it-uses-EVM-but-does-not-turn-itself-into-Ethereum"><a href="#4-The-smartest-thing-about-Arc-it-uses-EVM-but-does-not-turn-itself-into-Ethereum" class="headerlink" title="4. The smartest thing about Arc: it uses EVM but does not turn itself into Ethereum"></a>4. The smartest thing about Arc: it uses EVM but does not turn itself into Ethereum</h1><p>It is important to distinguish two concepts that are often conflated in the crypto community:</p>
+<pre><code class="text">EVM
+</code></pre>
+<p>and:</p>
+<pre><code class="text">Ethereum
+</code></pre>
+<p>They are not the same thing.</p>
+<p>EVM is the execution environment.</p>
+<p>Ethereum is a complete set of:</p>
+<ul>
+<li>consensus;</li>
+<li>network;</li>
+<li>historical status;</li>
+<li>ETH; </li>
+<li>validator economy; </li>
+<li>fee market; </li>
+<li>community governance;</li>
+<li>upgrade route;</li>
+<li>Historically compatible;</li>
+</ul>
+<p>Arc is EVM-compatible.</p>
+<p>So Solidity developers can continue to use the tools and development paradigms they are familiar with. Circle has clearly emphasized Arc’s EVM compatibility from the beginning.</p>
+<p>But Arc is my own <strong>Layer 1</strong>.</p>
+<p>It is not:</p>
+<pre><code class="text">Ethereum L2
+</code></pre>
+<p>Nor:</p>
+<pre><code class="text">Ethereum Sidechain
+</code></pre>
+<p>Not even:</p>
+<pre><code class="text">Submit the transaction to Ethereum last for security.
+</code></pre>
+<p>It has its own validator set and its own consensus.</p>
+<p>The official mainnet version in 2026 will use permissioned validator set and provide deterministic and sub-second finality. Circle positions itself as an independent L1 for financial markets.</p>
+<p>So more accurately:</p>
+<blockquote>
+<p><strong>Arc uses the virtual machine standard invented and popularized by Ethereum, but does not purchase Ethereum’s security.</strong></p>
+</blockquote>
+<p>This matter is very critical.</p>
+<hr>
+<h1 id="5-This-may-be-EVM’s-ultimate-biggest-victory-Ethereum-can-lose-but-EVM-can-still-win"><a href="#5-This-may-be-EVM’s-ultimate-biggest-victory-Ethereum-can-lose-but-EVM-can-still-win" class="headerlink" title="5. This may be EVM’s ultimate biggest victory: Ethereum can lose, but EVM can still win."></a>5. This may be EVM’s ultimate biggest victory: Ethereum can lose, but EVM can still win.</h1><p>Many people naturally think:</p>
+<p>EVM ecosystem grows,</p>
+<p>This means that the value of Ethereum increases.</p>
+<p>I increasingly don’t think these two things are bound to each other.</p>
+<p>Look at Arc.</p>
+<p>Developers can continue:</p>
+<pre><code class="text">Solidity
+Foundry
+Hardhat
+Viem
+MetaMask
+EVM ABI
+0x Address
+ERC-20
+</code></pre>
+<p>But the entire economic system can be:</p>
+<pre><code class="text">USDC
+    ↓
+Arc
+</code></pre>
+<p>There is no need to go through:</p>
+<pre><code class="text">ETH
+</code></pre>
+<p>This means a very interesting possibility:</p>
+<p><strong>The EVM may one day be as successful as Linux, but Ethereum itself does not monopolize all economic value.</strong></p>
+<p>The Linux kernel is very successful.</p>
+<p>It does not mean that all revenue from software built on Linux will go to a “Linux Token”.</p>
+<p>TCP&#x2F;IP was extremely successful.</p>
+<p>There is no TCP Token that continues to appreciate in value due to increased Internet traffic.</p>
+<p>HTML becomes a world standard.</p>
+<p>There is also no HTML Coin taxed every time a web page is opened.</p>
+<p>So we have to start distinguishing:</p>
+<blockquote>
+<p>Ethereum created the EVM.</p>
+</blockquote>
+<p>and:</p>
+<blockquote>
+<p>All economic activities using EVM should assign a value to ETH.</p>
+</blockquote>
+<p>Totally two different things.</p>
+<p>Arc is one of the most beautiful examples of this logic.</p>
+<hr>
+<h1 id="6-Arc-can-make-extensive-use-of-Ethereum’s-legacy-while-preventing-ETH-from-capturing-these-values"><a href="#6-Arc-can-make-extensive-use-of-Ethereum’s-legacy-while-preventing-ETH-from-capturing-these-values" class="headerlink" title="6. Arc can make extensive use of Ethereum’s legacy while preventing ETH from capturing these values."></a>6. Arc can make extensive use of Ethereum’s legacy while preventing ETH from capturing these values.</h1><p>Assume that Arc appears in the future:</p>
+<p>$100 billion stablecoin settlement.</p>
+<p>Tokenized Treasury.</p>
+<p>foreign exchange.</p>
+<p>securities.</p>
+<p>RWA.</p>
+<p>AI Agent Payment.</p>
+<p>Corporate Treasury.</p>
+<p>On-chain Lending.</p>
+<p>DEX.</p>
+<p>These applications may still use:</p>
+<p>Solidity.</p>
+<p>ERC-20.</p>
+<p>ERC-721.</p>
+<p>ERC-4626.</p>
+<p>EVM.</p>
+<p>Even a lot of the infrastructure invented in the Ethereum era.</p>
+<p>But these transactions:</p>
+<p><strong>No ETH required.</strong></p>
+<p>There is no need to buy ETH to pay for gas.</p>
+<p>No Ethereum validator is required.</p>
+<p>No Ethereum blob required.</p>
+<p>No Ethereum settlement is required.</p>
+<p>There’s no need to wait for Ethereum Finality either.</p>
+<p>This creates a state that was rarely seen before:</p>
+<blockquote>
+<p><strong>Ethereum’s technical standards are preserved, but ETH’s value capture is cut off.</strong></p>
+</blockquote>
+<p>From an ETH investor perspective, this is not necessarily a good thing.</p>
+<p>From the perspective of the entire industry, I think it is very healthy.</p>
+<p>Because:</p>
+<p><strong>Technical standards should be able to exist independently of the assets that create them.</strong></p>
+<p>Otherwise it is not a standard.</p>
+<p>It’s just a walled garden.</p>
+<hr>
+<h1 id="7-Arc’s-value-scale-is-not-even-“Crypto”-but-US-dollars"><a href="#7-Arc’s-value-scale-is-not-even-“Crypto”-but-US-dollars" class="headerlink" title="7. Arc’s value scale is not even “Crypto”, but US dollars"></a>7. Arc’s value scale is not even “Crypto”, but US dollars</h1><p>This is one of the most fundamental differences between Arc and traditional public blockchains.</p>
+<p>Ethereum’s economic scale is ultimately:</p>
+<pre><code class="text">ETH
+</code></pre>
+<p>Gas uses ETH.</p>
+<p>Validator receives ETH.</p>
+<p>Security budget is measured in ETH.</p>
+<p>The network economy is ultimately built on the asset ETH.</p>
+<p>Arc turns the lowest unit of the entire system into:</p>
+<pre><code class="text">USDC
+</code></pre>
+<p>The target unit of USDC is:</p>
+<pre><code class="text">1 USDC ≈ 1 USD
+</code></pre>
+<p>Circle says USDC is backed 1:1 by cash and highly liquid cash equivalents and is designed to be redeemable at one dollar.</p>
+<p>So Arc did something very bold:</p>
+<p><strong>Directly move real-world currency units into the bottom layer of the blockchain.</strong></p>
+<p>Not:</p>
+<pre><code class="text">Gas = 0.000034 ARC
+</code></pre>
+<p>Then the user opens CoinGecko:</p>
+<blockquote>
+<p>Right now the ARC is $17.42, so how much is it?</p>
+</blockquote>
+<p>Instead:</p>
+<pre><code class="text">Gas ≈ $0.00x
+</code></pre>
+<p>This makes sense for Consumer UX.</p>
+<p>But it means more to the business.</p>
+<p>Because the company:</p>
+<p>Revenue.</p>
+<p>Cost.</p>
+<p>Treasury.</p>
+<p>Accounting.</p>
+<p>Budget.</p>
+<p>Risk.</p>
+<p>All are:</p>
+<p><strong>Fiat-denominated.</strong></p>
+<p>Blockchain finally stops requiring companies to enter a parallel currency system first.</p>
+<hr>
+<h1 id="8-I-even-think-that-“no-speculative-token-of-its-own”-is-one-of-Arc’s-most-powerful-product-designs"><a href="#8-I-even-think-that-“no-speculative-token-of-its-own”-is-one-of-Arc’s-most-powerful-product-designs" class="headerlink" title="8. I even think that “no speculative token of its own” is one of Arc’s most powerful product designs"></a>8. I even think that “no speculative token of its own” is one of Arc’s most powerful product designs</h1><p>The Crypto industry has developed a very strange reflex:</p>
+<p>A new chain is released.</p>
+<p>Everyone’s first words:</p>
+<blockquote>
+<p>What is Token?</p>
+</blockquote>
+<p>What about Tokenomics?</p>
+<p>How much FDV?</p>
+<p>How much is the airdrop?</p>
+<p>When is TGE?</p>
+<p>How much is the Validator APR?</p>
+<p>What does Unlock Schedule look like?</p>
+<p>The most interesting thing about Arc is exactly this:</p>
+<p><strong>The entire discussion could have been non-existent.</strong></p>
+<p>What the network needs is:</p>
+<p>Money.</p>
+<p>It uses USDC directly.</p>
+<p>So users don’t need to think simultaneously:</p>
+<pre><code class="text">Is this chain good?
+</code></pre>
+<p>and:</p>
+<pre><code class="text">Will the currency of this chain fall by 80%?
+</code></pre>
+<p>The two issues were finally separated.</p>
+<p>It’s extremely clean.</p>
+<hr>
+<h1 id="9-One-of-the-biggest-problems-of-Ethereum-is-that-it-always-mixes-“network-usage-value”-and-“Token-investment-value”"><a href="#9-One-of-the-biggest-problems-of-Ethereum-is-that-it-always-mixes-“network-usage-value”-and-“Token-investment-value”" class="headerlink" title="9. One of the biggest problems of Ethereum is that it always mixes “network usage value” and “Token investment value”"></a>9. One of the biggest problems of Ethereum is that it always mixes “network usage value” and “Token investment value”</h1><p>There has been a very strange discussion in the Ethereum community for a long time:</p>
+<p>Internet usage increases,</p>
+<p>Should ETH rise?</p>
+<p>Blob charges increased,</p>
+<p>Is ETH deflationary?</p>
+<p>Is L2 sucking away ETH value?</p>
+<p>Is Burn Enough?</p>
+<p>How about Validator Yield?</p>
+<p>Ultrasound Money?</p>
+<p>These things can be discussed from both a technical perspective and an investment perspective.</p>
+<p>But for a real payment system:</p>
+<p><strong>Why should users care about this?</strong></p>
+<p>Visa users don’t research:</p>
+<blockquote>
+<p>Every time a payment is completed on the Visa network, how much V stock is destroyed?</p>
+</blockquote>
+<p>Bank customers don’t research:</p>
+<blockquote>
+<p>What is the recent inflation rate of SWIFT’s settlement token?</p>
+</blockquote>
+<p>Enterprises only hope:</p>
+<pre><code class="text">Send $1,000,000
+</code></pre>
+<p>Then:</p>
+<pre><code class="text">The other party received $1,000,000
+</code></pre>
+<p>The cost is clear.</p>
+<p>Time is clear.</p>
+<p>Finality is clear.</p>
+<p>Arc has been closer to this idea since day one.</p>
+<hr>
+<h1 id="10-The-Arc-never-had-to-pretend-to-be-an-anarchist-experiment"><a href="#10-The-Arc-never-had-to-pretend-to-be-an-anarchist-experiment" class="headerlink" title="10. The Arc never had to pretend to be an anarchist experiment"></a>10. The Arc never had to pretend to be an anarchist experiment</h1><p>This is also where I think Arc is more honest than many traditional Crypto projects.</p>
+<p>A very important part of Ethereum’s historical narrative is:</p>
+<p>Decentralization.</p>
+<p>Censorship Resistance.</p>
+<p>Permissionless Validation.</p>
+<p>Trustlessness.</p>
+<p>These certainly have value.</p>
+<p>But the Crypto industry has a very serious problem:</p>
+<p><strong>Consider “more decentralization” as the only correct optimization direction for all scenarios by default.</strong></p>
+<p>Actually not.</p>
+<p>Bank liquidation is not.</p>
+<p>The stock market is not.</p>
+<p>Corporate Treasury is not.</p>
+<p>Cross-border payments don’t necessarily have to be either.</p>
+<p>What these institutions care more about are usually:</p>
+<p>Who is responsible?</p>
+<p>Who regulates?</p>
+<p>Finality OK?</p>
+<p>Who to call if something goes wrong?</p>
+<p>Who are the participants?</p>
+<p>Where are the boundaries of responsibility?</p>
+<p>Does the system meet regulatory requirements?</p>
+<p>Arc explicitly selects permissioned validators.</p>
+<p>Circle even uses this as a selling point to banks:</p>
+<p>Known, screened validators.</p>
+<p>Clear governance responsibilities.</p>
+<p>Finality.</p>
+<p>Circle believes this helps banks with risk management and aligns with Basel and financial market infrastructure principles.</p>
+<p>Crypto fundamentalists may see:</p>
+<pre><code class="text">Permissioned Validator
+</code></pre>
+<p>Then immediately said:</p>
+<blockquote>
+<p>Not decentralized enough.</p>
+</blockquote>
+<p>My question is:</p>
+<p><strong>So what?</strong></p>
+<hr>
+<h1 id="11-Centralization-never-automatically-means-bad-things"><a href="#11-Centralization-never-automatically-means-bad-things" class="headerlink" title="11. Centralization never automatically means bad things"></a>11. Centralization never automatically means bad things</h1><p>Coinbase is a great example.</p>
+<p>Coinbase is a company.</p>
+<p>Someone manages it.</p>
+<p>Regulated.</p>
+<p>Government orders can be received.</p>
+<p>Laws need to be followed.</p>
+<p>But this does not mean:</p>
+<p>Coinbase has no value.</p>
+<p>Quite the opposite.</p>
+<p>For a large number of ordinary users:</p>
+<p>“Someone is in charge”</p>
+<p>Even advantages.</p>
+<p>Because the real world financial system is originally built on:</p>
+<pre><code class="text">Responsibility
+Accountability
+Jurisdiction
+Regulation
+</code></pre>
+<p>above.</p>
+<p>Decentralization solves a very important problem:</p>
+<blockquote>
+<p>How to reduce the need to trust a subject?</p>
+</blockquote>
+<p>But it’s not free.</p>
+<p>The price it pays is:</p>
+<p>Governance is slower.</p>
+<p>Agreements are more difficult to amend.</p>
+<p>Historical compatibility is becoming more and more serious.</p>
+<p>Upgrading requires the coordination of a large number of independent actors.</p>
+<p>Complexity is hard to force clean.</p>
+<p>Once a faulty design is widely deployed, it is almost impossible to roll it back.</p>
+<p>Arc has a huge advantage that Ethereum does not have:</p>
+<p><strong>It can make decisions.</strong></p>
+<hr>
+<h1 id="12-“Being-able-to-make-decisions”-is-actually-an-engineering-ability-that-is-seriously-underestimated-by-Crypto"><a href="#12-“Being-able-to-make-decisions”-is-actually-an-engineering-ability-that-is-seriously-underestimated-by-Crypto" class="headerlink" title="12. “Being able to make decisions” is actually an engineering ability that is seriously underestimated by Crypto."></a>12. “Being able to make decisions” is actually an engineering ability that is seriously underestimated by Crypto.</h1><p>What if Ethereum said today:</p>
+<blockquote>
+<p>We have deleted all old EOAs.</p>
+</blockquote>
+<p>Impossible.</p>
+<blockquote>
+<p>ERC-20 redesign.</p>
+</blockquote>
+<p>Impossible.</p>
+<blockquote>
+<p>All historical Fork code is deleted.</p>
+</blockquote>
+<p>Impossible.</p>
+<blockquote>
+<p>Change account structure.</p>
+</blockquote>
+<p>Extremely difficult.</p>
+<blockquote>
+<p>Forced migration of all users.</p>
+</blockquote>
+<p>Even more impossible.</p>
+<p>Because Ethereum is a public protocol that has been running for more than ten years.</p>
+<p>No CEO can push buttons:</p>
+<pre><code class="text">Migrate
+</code></pre>
+<p>Arc is different.</p>
+<p>At least at this stage of development, it’s a very clean sheet of paper.</p>
+<p>What’s wrong with the agreement?</p>
+<p>Change.</p>
+<p>Gas model unreasonable?</p>
+<p>Change.</p>
+<p>Do financial institutions need new privacy mechanisms?</p>
+<p>do.</p>
+<p>Validator structure needs to be adjusted?</p>
+<p>Governance.</p>
+<p>This of course means more trust.</p>
+<p>But it also means:</p>
+<p><strong>It will not naturally inherit Ethereum’s “no history can be deleted” curse.</strong></p>
+<p>The younger a protocol is, the greater this advantage is.</p>
+<hr>
+<h1 id="13-Why-I-say-Arc-is-“taking-EVM-from-the-corpse-of-Ethereum”"><a href="#13-Why-I-say-Arc-is-“taking-EVM-from-the-corpse-of-Ethereum”" class="headerlink" title="13. Why I say Arc is “taking EVM from the corpse of Ethereum”"></a>13. Why I say Arc is “taking EVM from the corpse of Ethereum”</h1><p>This sentence may be difficult to hear.</p>
+<p>But that’s how technology always evolves.</p>
+<p>The smartest thing about the new system is not to reject everything from the previous generation.</p>
+<p>Instead:</p>
+<p><strong>Inherit the standard, discard the implementation.</strong></p>
+<p>Unix leaves POSIX.</p>
+<p>The browser leaves JavaScript behind.</p>
+<p>SQL spans decades of databases.</p>
+<p>x86 software even spans completely different generations of CPUs.</p>
+<p>Arc’s smartest attitude towards Ethereum is also:</p>
+<p>Ethereum spent ten years doing the most difficult thing for the entire industry:</p>
+<p>Build:</p>
+<pre><code class="text">EVM
+Solidity
+ABI
+ERC
+Wallet
+Tooling
+Developer Mindshare
+</code></pre>
+<p>Why don’t you want these things?</p>
+<p>Of course.</p>
+<p>However:</p>
+<pre><code class="text">ETH monetary system
+PoS economics
+historical state
+old forks
+Ethereum governance
+Rollup roadmap
+L1 fee history
+</code></pre>
+<p>Why must they be inherited together?</p>
+<p><strong>Totally unnecessary.</strong></p>
+<p>So I think more and more:</p>
+<p>Arc is not an Ethereum Killer.</p>
+<p>This word is too vulgar.</p>
+<p>It’s more like:</p>
+<p><strong>Ethereum Unbundling.</strong></p>
+<p>Open Ethereum.</p>
+<p>Leave valuable components behind.</p>
+<p>Get rid of unnecessary components.</p>
+<hr>
+<h1 id="14-This-is-where-Arc-is-more-interesting-than-Base"><a href="#14-This-is-where-Arc-is-more-interesting-than-Base" class="headerlink" title="14. This is where Arc is more interesting than Base"></a>14. This is where Arc is more interesting than Base</h1><p>Base was successful.</p>
+<p>And it’s very easy to use.</p>
+<p>But Base still belongs to the Ethereum world from a technical and economic perspective.</p>
+<p>It is an Ethereum L2.</p>
+<p>The final settlement and its long-term security architecture are structurally tied to Ethereum.</p>
+<p>Arc is different.</p>
+<p>Arc is L1.</p>
+<p>It is not:</p>
+<blockquote>
+<p>A better usable entry to Ethereum.</p>
+</blockquote>
+<p>Instead:</p>
+<blockquote>
+<p><strong>An independent network using Ethereum development standards but with its own financial system.</strong></p>
+</blockquote>
+<p>The difference is very big.</p>
+<p>The development of Base can continue to expand Ethereum’s Rollup territory to a certain extent.</p>
+<p>The development of Arc proves another thing:</p>
+<p><strong>The ecological expansion of EVM is not equal to the expansion of Ethereum itself.</strong></p>
+<p>In a sense, this is a more dangerous route to the ETH Value Capture Thesis.</p>
+<hr>
+<h1 id="15-Arc’s-real-moat-is-not-even-the-blockchain-but-the-money-Circle-already-owns"><a href="#15-Arc’s-real-moat-is-not-even-the-blockchain-but-the-money-Circle-already-owns" class="headerlink" title="15. Arc’s real moat is not even the blockchain, but the money Circle already owns"></a>15. Arc’s real moat is not even the blockchain, but the money Circle already owns</h1><p>This is another place that many “new public blockchains” cannot copy.</p>
+<p>Ordinary public blockchains face a chicken-and-egg problem when they are launched:</p>
+<p>No one uses it.</p>
+<p>So there is no liquidity.</p>
+<p>There is no liquidity.</p>
+<p>So no one deploys the application.</p>
+<p>No one deploys the application.</p>
+<p>So there are fewer users.</p>
+<p>In the end we can only:</p>
+<p>Send Token.</p>
+<p>Mining.</p>
+<p>subsidies.</p>
+<p>Airdrop.</p>
+<p>To TVL.</p>
+<p>Use money to buy ecology.</p>
+<p>Arc started from a completely different place.</p>
+<p>It already has:</p>
+<p><strong>USDC.</strong></p>
+<p>As of Arc’s mainnet launch in September 2026, Circle stated that USDC circulation has exceeded <strong>$74 billion</strong>.</p>
+<p>USDC was natively deployed on 30 blockchains by the end of 2025; Circle’s CCTP covered 18 chains at that time, and processed approximately $31 billion in cross-chain transfers in the third quarter of 2025.</p>
+<p>This means Arc doesn’t need to be invented from scratch:</p>
+<p>“Money.”</p>
+<p>Circle already has money.</p>
+<p>Arc does:</p>
+<p><strong>Use the money to build your own operating system.</strong></p>
+<p>This is a completely different starting point.</p>
+<hr>
+<h1 id="16-Circle-used-to-be-a-tenant-on-someone-else’s-blockchain-but-now-it-has-become-its-own-landlord"><a href="#16-Circle-used-to-be-a-tenant-on-someone-else’s-blockchain-but-now-it-has-become-its-own-landlord" class="headerlink" title="16. Circle used to be a tenant on someone else’s blockchain, but now it has become its own landlord."></a>16. Circle used to be a tenant on someone else’s blockchain, but now it has become its own landlord.</h1><p>This is the easiest way to understand Arc.</p>
+<p>Previously:</p>
+<p>USDC runs on Ethereum.</p>
+<p>Circle brings huge transaction demand to Ethereum.</p>
+<p>But users pay ETH Gas.</p>
+<p>Ethereum Validator gets fees.</p>
+<p>USDC’s adoption growth helps the Ethereum ecosystem.</p>
+<p>Then USDC ran to:</p>
+<p>Solana.</p>
+<p>Base.</p>
+<p>Arbitrum.</p>
+<p>Avalanche.</p>
+<p>Polygon.</p>
+<p>Many chains.</p>
+<p>Circle is:</p>
+<p><strong>Asset issuer.</strong></p>
+<p>The chain is:</p>
+<p><strong>Infrastructure owners.</strong></p>
+<p>After the advent of Arc, this relationship changed.</p>
+<p>For the first time, Circle has:</p>
+<pre><code class="text">Money
++
+Settlement Layer
++
+Developer Infrastructure
++
+Interoperability
++
+Payments Network
++
+FX
+</code></pre>
+<p>Circle even directly described its product system as the Internet Financial Platform in 2026, and Arc is the underlying Economic OS.</p>
+<p>This is where Arc’s truly huge potential lies.</p>
+<p>It is not an additional EVM Chain with higher TPS.</p>
+<p><strong>It is Circle’s move from “issuing money on other people’s operating systems” to “owning its own operating system.”</strong></p>
+<hr>
+<h1 id="17-Even-cross-chain-is-a-completely-different-problem-for-Arc"><a href="#17-Even-cross-chain-is-a-completely-different-problem-for-Arc" class="headerlink" title="17. Even cross-chain is a completely different problem for Arc"></a>17. Even cross-chain is a completely different problem for Arc</h1><p>The cross-chain issues in the Ethereum L2 world are:</p>
+<p>Assets are broken.</p>
+<p>What to do?</p>
+<p>So it appears:</p>
+<p>Bridge.</p>
+<p>Liquidity Provider.</p>
+<p>Solver.</p>
+<p>Intent.</p>
+<p>Canonical Bridge.</p>
+<p>Message Passing.</p>
+<p>Arc’s route has a natural advantage:</p>
+<p><strong>Circle itself is the issuer of USDC.</strong></p>
+<p>This means that it does not necessarily need to understand “cross-chain USDC” as:</p>
+<blockquote>
+<p>Lock up a packaging token on chain A, and then cast a mapping token on chain B.</p>
+</blockquote>
+<p>CCTP can do:</p>
+<pre><code class="text">Burn on chain A
+
+↓
+
+Circle attestation
+
+↓
+
+Mint native USDC on chain B
+</code></pre>
+<p>Circle is also using Gateway to abstract USDC liquidity on multiple chains into a unified balance. Its 2026 data clearly positions Arc as a high-speed settlement environment where cross-chain USDC can converge.</p>
+<p>This means:</p>
+<p>Many public blockchains need to solve problems through complex financial engineering.</p>
+<p>Circle can be used directly in:</p>
+<p><strong>currency issuance layer</strong></p>
+<p>solved.</p>
+<p>This is a huge structural advantage.</p>
+<hr>
+<h1 id="18-The-endgame-of-Arc-may-not-be-the-DeFi-Chain-at-all-but-the-Internet-execution-layer-of-the-US-dollar"><a href="#18-The-endgame-of-Arc-may-not-be-the-DeFi-Chain-at-all-but-the-Internet-execution-layer-of-the-US-dollar" class="headerlink" title="18. The endgame of Arc may not be the DeFi Chain at all, but the Internet execution layer of the US dollar"></a>18. The endgame of Arc may not be the DeFi Chain at all, but the Internet execution layer of the US dollar</h1><p>If you just understand Arc as:</p>
+<p>“Circle made an EVM Chain.”</p>
+<p>I think it’s grossly underestimated.</p>
+<p>Circle’s own goals are already very clear:</p>
+<p>Payments.</p>
+<p>FX.</p>
+<p>Capital Markets.</p>
+<p>Tokenized Assets.</p>
+<p>Treasury.</p>
+<p>AI Agents.</p>
+<p>Machine-to-machine Payments.</p>
+<p>When the mainnet was released, Arc was even directly called:</p>
+<p><strong>Economic Operating System for the Internet.</strong></p>
+<p>There is certainly a marketing component to this statement.</p>
+<p>But the direction deserves careful attention.</p>
+<p>Because the truly huge market is never:</p>
+<p>Crypto Degens Swap multiple times.</p>
+<p>Instead:</p>
+<p>The flow of money that occurs every day between companies around the world.</p>
+<p>Securities Clearing.</p>
+<p>Cross-border payments.</p>
+<p>Money management.</p>
+<p>Foreign exchange settlement.</p>
+<p>Tokenized Treasury.</p>
+<p>AI Agent automates payments.</p>
+<p>If these things do get onto the chain, what they need is not necessarily:</p>
+<blockquote>
+<p>The world’s most decentralized smart contract platform.</p>
+</blockquote>
+<p>They may need more:</p>
+<pre><code class="text">USD denominated
+Finality
+Clear governance
+Regulatory Compatibility
+Privacy
+Programmable
+Global 24/7
+Standardized development tools
+</code></pre>
+<p>And that’s exactly what Arc has been targeting from day one.</p>
+<hr>
+<h1 id="19-Arc’s-“centralization”-may-even-be-its-biggest-weapon-in-competing-against-Ethereum"><a href="#19-Arc’s-“centralization”-may-even-be-its-biggest-weapon-in-competing-against-Ethereum" class="headerlink" title="19. Arc’s “centralization” may even be its biggest weapon in competing against Ethereum"></a>19. Arc’s “centralization” may even be its biggest weapon in competing against Ethereum</h1><p>Many people will think:</p>
+<p>Ethereum: </p>
+<pre><code class="text">decentralized
+</code></pre>
+<p>Arc: </p>
+<pre><code class="text">permissioned validators
+</code></pre>
+<p>So Ethereum Advanced.</p>
+<p>Arc is low level.</p>
+<p>Instead, I think this judgment is too simplistic.</p>
+<p>If the goal is:</p>
+<p><strong>Censorship-resistant sovereign money</strong></p>
+<p>Ethereum’s model clearly has huge advantages.</p>
+<p>If the goal is:</p>
+<p><strong>Let global banks settle $1 billion on-chain</strong></p>
+<p>The situation may not be the same.</p>
+<p>A bank is more likely to ask:</p>
+<blockquote>
+<p>Who runs Validator?</p>
+</blockquote>
+<blockquote>
+<p>Who is responsible if there is a problem with the network?</p>
+</blockquote>
+<blockquote>
+<p>What is the legal significance of Finality?</p>
+</blockquote>
+<blockquote>
+<p>Can you be sure that the transaction will not be reorg?</p>
+</blockquote>
+<blockquote>
+<p>Does it meet regulatory requirements?</p>
+</blockquote>
+<blockquote>
+<p>Can sensitive transaction information be protected?</p>
+</blockquote>
+<p>At this time:</p>
+<pre><code class="text">Known Validators
+</code></pre>
+<p>Maybe not even a flaw.</p>
+<p>Instead:</p>
+<p><strong>Feature.</strong></p>
+<p>Circle is clearly leveraging this structure to court the banking and institutional scene, rather than trying to pretend that Arc does the exact same thing as Ethereum.</p>
+<hr>
+<h1 id="20-Of-course-Arc’s-“cleanliness”-is-not-free"><a href="#20-Of-course-Arc’s-“cleanliness”-is-not-free" class="headerlink" title="20. Of course, Arc’s “cleanliness” is not free."></a>20. Of course, Arc’s “cleanliness” is not free.</h1><p>The other side must be made clear here.</p>
+<p>Otherwise, the article will be written as an advertisement.</p>
+<p>Arc has no historical debt to Ethereum.</p>
+<p>But it carries its own concentration risks.</p>
+<p>Arc uses permissioned validator set.</p>
+<p>It’s highly tied to Circle’s infrastructure.</p>
+<p>USDC’s credit comes from Circle’s reserves, custody, and U.S. dollar banking system.</p>
+<p>So Arc is not:</p>
+<p><strong>Trustless Ethereum, but better.</strong></p>
+<p>Not at all.</p>
+<p>What it does is another trade-off:</p>
+<p>Ethereum: </p>
+<pre><code class="text">Greater decentralization
+Stronger censorship resistance
+more difficult to change
+More historical debt
+complex economic system
+</code></pre>
+<p>Arc: </p>
+<pre><code class="text">Clearer control boundaries
+Stronger institutional attributes
+easier to govern
+Easier to do product optimization
+But relies more on Circle,
+validator governance
+and the dollar system
+</code></pre>
+<p>So the real question is not:</p>
+<p>Who is absolutely right?</p>
+<p>Instead:</p>
+<p><strong>What kind of thing does the financial world need?</strong></p>
+<p>My judgment is:</p>
+<p>Both will exist.</p>
+<p>But in the past, the Crypto industry has seriously overestimated the first demand,</p>
+<p>At the same time, the second demand is seriously underestimated.</p>
+<hr>
+<h1 id="21-The-scariest-thing-about-Arc-is-that-it-does-not-need-to-prove-that-ETH-has-no-value"><a href="#21-The-scariest-thing-about-Arc-is-that-it-does-not-need-to-prove-that-ETH-has-no-value" class="headerlink" title="21. The scariest thing about Arc is that it does not need to prove that ETH has no value"></a>21. The scariest thing about Arc is that it does not need to prove that ETH has no value</h1><p>I think this is really something to be wary of about Ethereum.</p>
+<p>Arc doesn’t require at all:</p>
+<p>Attack Ethereum.</p>
+<p>Kill Ethereum.</p>
+<p>Replace Ethereum.</p>
+<p>Prove that ETH returns to zero.</p>
+<p>Neither is needed.</p>
+<p>It only needs to prove one thing:</p>
+<blockquote>
+<p><strong>A huge on-chain financial system that can use EVM but does not require ETH at all.</strong></p>
+</blockquote>
+<p>If this proposition is true,</p>
+<p>Its meaning is far greater than the so-called:</p>
+<pre><code class="text">Ethereum Killer
+</code></pre>
+<p>Much bigger.</p>
+<p>Because one of Ethereum’s biggest moats in the past was:</p>
+<p>Developer.</p>
+<p>Toolchain.</p>
+<p>Solidity.</p>
+<p>EVM.</p>
+<p>Wallet ecology.</p>
+<p>standard.</p>
+<p>But Arc hints at a future:</p>
+<p>All of these things can continue to exist.</p>
+<p>Meanwhile:</p>
+<p><strong>Ethereum itself is not necessarily at the center of the value stream.</strong></p>
+<hr>
+<h1 id="22-This-may-be-the-real-competition-that-Ethereum-finally-faces"><a href="#22-This-may-be-the-real-competition-that-Ethereum-finally-faces" class="headerlink" title="22. This may be the real competition that Ethereum finally faces."></a>22. This may be the real competition that Ethereum finally faces.</h1><p>Ethereum has been worried about:</p>
+<p>Solana.</p>
+<p>Faster chain.</p>
+<p>Cheaper chain.</p>
+<p>Higher TPS.</p>
+<p>I feel more and more that this may not be the real thing to worry about.</p>
+<p>The most dangerous contender is not:</p>
+<blockquote>
+<p>I redesigned a VM that was better than the EVM.</p>
+</blockquote>
+<p>Instead:</p>
+<blockquote>
+<p><strong>Thank you for helping the entire industry spend ten years to mature EVM, Solidity, wallets and development tools.</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>I’ll take them all.</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>I don’t want the rest.</strong></p>
+</blockquote>
+<p>ETH doesn’t.</p>
+<p>No historical debt.</p>
+<p>Gas Token is not for speculation.</p>
+<p>Fork for more than ten years is not necessary.</p>
+<p>Rollup has no complexity.</p>
+<p>No need for ideological baggage.</p>
+<p>This is where the Arc is at its sharpest.</p>
+<hr>
+<h1 id="Conclusion-Ethereum-invented-the-world-Arc-only-takes-away-the-useful-parts"><a href="#Conclusion-Ethereum-invented-the-world-Arc-only-takes-away-the-useful-parts" class="headerlink" title="Conclusion: Ethereum invented the world, Arc only takes away the useful parts"></a>Conclusion: Ethereum invented the world, Arc only takes away the useful parts</h1><p>I don’t think Arc is a technological revolution.</p>
+<p>In a sense it’s quite the opposite:</p>
+<p><strong>It could be a technological disenchantment.</strong></p>
+<p>It recognizes:</p>
+<p>EVM is good.</p>
+<p>Solidity is good.</p>
+<p>ERC is good.</p>
+<p>Smart contracts are great.</p>
+<p>Publicly programmable ledgers are great.</p>
+<p>However:</p>
+<p>This does not mean that all of Ethereum’s design must be inherited together.</p>
+<p>It does not mean:</p>
+<p><strong>In order to use blockchain, the world must first accept a volatile Crypto Asset as the economic base.</strong></p>
+<p>What Arc does is actually very simple:</p>
+<pre><code class="text">Keep EVM
+Keep Solidity
+Reserve ERC
+Keep smart contracts
+
+Remove ETH dependency
+Delete native speculation token
+Delete Ethereum settlement
+Delete Ethereum historical state
+Remove Ethereum Rollup Baggage
+
+Join USDC Gas
+Add finality
+Add known Validators
+Join institutional governance
+Join native financial infrastructure
+</code></pre>
+<p>That’s why I feel like Arc is so clean.</p>
+<p>Ethereum is like an old city with more than ten years of history.</p>
+<p>Countless roads cannot be demolished.</p>
+<p>Countless old buildings cannot be moved.</p>
+<p>There are pipelines of different ages buried underground.</p>
+<p>Every modernization</p>
+<p>We can only continue to build on the past.</p>
+<p>Arc is different.</p>
+<p>It’s a new drawing.</p>
+<p>But it’s not like starting over from the Stone Age.</p>
+<p>It directly brings the best industrial achievements of this old city for more than ten years:</p>
+<p>EVM.</p>
+<p>Solidity.</p>
+<p>ERC.</p>
+<p>Wallet.</p>
+<p>Tooling.</p>
+<p>Then re-plan the city.</p>
+<p>So if you have to sum up Arc in one sentence:</p>
+<p><strong>It’s not abandoning Ethereum.</strong></p>
+<p>Quite the opposite.</p>
+<p><strong>It understands Ethereum to the extent that it knows which things in Ethereum are worth inheriting and which things are not worth inheriting at all.</strong></p>
+<p>Ethereum created the EVM.</p>
+<p>But EVM may not always belong to Ethereum.</p>
+<p>USDC was born and grew up in the Ethereum world.</p>
+<p>But dollars may not always need ETH to flow on the chain.</p>
+<p>The most interesting thing about Arc is here:</p>
+<p><strong>It was born in the technological era of Ethereum, but it is the first serious attempt to build an EVM financial world that does not require Ethereum.</strong></p>
+<p>if it succeeds,</p>
+<p>Ethereum leaves the greatest legacy to the next generation,</p>
+<p>Probably not ETH after all.</p>
+<p>Instead:</p>
+<p><strong>EVM.</strong></p>
+</div></div></div></body><!-- Defer non-critical scripts for better performance--><script defer src="/js/jquery.min.js?v=v1.2"></script><script defer src="/js/highlight.min.js?v=v1.2"></script><script defer src="/js/main.js?v=v1.2"></script><script defer src="/js/lightbox.js?v=v1.2"></script><script defer src="/js/bootstrap.min.js?v=v1.2"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-5JRBZ6P1W3"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5JRBZ6P1W3');</script></html>

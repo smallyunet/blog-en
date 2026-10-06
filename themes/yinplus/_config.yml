@@ -1,7 +1,9 @@
 # Navigation bar without starting with a slash
 menu:
-  Blog: ''
-  Contact: about
+  中文版: https://smallyu.net/
+  English: ''
+  AI Article Library: ai/
+  # Contact: about
 
 # Recommended to enable when the page count is more than 1
 paginator: false
